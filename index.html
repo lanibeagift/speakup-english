@@ -118,7 +118,10 @@ textarea::placeholder{color:var(--text3)}
 .w-miss{color:var(--yellow);font-style:italic}
 
 /* SHADOWING */
-.script-box{background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--gold);border-radius:0 11px 11px 0;padding:0.95rem 1.1rem;font-size:1.03rem;line-height:1.8;color:var(--text);margin-bottom:1.2rem}
+.script-box{background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--gold);border-radius:0 11px 11px 0;padding:0.95rem 1.1rem;font-size:1.03rem;line-height:1.8;color:var(--text);margin-bottom:1.2rem;transition:filter 0.3s}
+.script-box.blurred{filter:blur(8px);user-select:none;cursor:pointer}
+.btn-toggle-script{background:none;border:1px solid var(--border2);border-radius:7px;padding:0.2rem 0.6rem;font-size:0.72rem;font-weight:500;color:var(--text3);cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.18s;white-space:nowrap}
+.btn-toggle-script:hover{border-color:var(--gold-dim);color:var(--gold)}
 .mic-area{text-align:center}
 .mic-btn{width:64px;height:64px;border-radius:50%;background:var(--card2);border:2px solid var(--border2);color:white;font-size:1.5rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;margin-bottom:0.6rem}
 .mic-btn:hover:not(:disabled){border-color:var(--gold);background:var(--gold-bg2);transform:scale(1.06)}
@@ -227,7 +230,10 @@ textarea::placeholder{color:var(--text3)}
 
     <!-- SHADOWING -->
     <div id="s-panel" style="display:none">
-      <div class="card-lbl">🎤 Listen, then shadow the speaker</div>
+      <div class="card-lbl" style="justify-content:space-between">
+        <span>🎤 Listen, then shadow the speaker</span>
+        <button class="btn-toggle-script" id="toggle-script-btn" onclick="toggleScript()">👁 Hide script</button>
+      </div>
       <div class="script-box" id="s-script"></div>
       <div class="mic-area">
         <div><button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤</button></div>
@@ -258,65 +264,52 @@ textarea::placeholder{color:var(--text3)}
 
 <script>
 // ── Script + Timestamps ────────────────────────────────
-// Each entry: [sentence text, start_seconds, end_seconds]
-// Whisper segments mapped to script sentences:
+// Mapped directly from Whisper output - each sentence matches audio exactly
 const SENTENCES = [
-  ["After the sharing time, the club owner smiled at me.",       0.00,   5.16],
-  ["Rose, she said, your family sounds interesting.",            5.16,   9.84],
-  ["I felt a little shy, but I smiled.",                         9.84,  13.92],
-  ["Thank you!",                                                13.92,  14.94],
-  ["Then she asked, do you live near here?",                    14.94,  19.54],
-  ["Yes, I said.",                                              19.54,  21.30],
-  ["My house is not very far from the club.",                   21.30,  25.04],
-  ["She laughed softly.",                                       25.04,  27.06],
-  ["Really? I would love to see your home someday.",            27.06,  30.82],
-  ["I thought for a moment.",                                   30.82,  33.10],
-  ["Then I said,",                                              33.10,  34.78],
-  ["Why don't you visit my house this weekend?",                34.78,  38.44],
-  ["Her eyes lit up.",                                          38.44,  40.46],
-  ["That sounds lovely!",                                       40.46,  42.66],
-  ["On Saturday afternoon, she came to my house.",              42.66,  46.08],
-  ["When she arrived, I opened the door and waved.",            46.08,  50.50],
-  ["Welcome to my house!",                                      50.50,  52.64],
-  ["She smiled and said,",                                      52.64,  54.22],
-  ["Thank you for inviting me, Rose.",                          54.22,  57.46],
-  ["She looked at the building and said,",                      57.46,  60.42],
-  ["Oh, this house looks quite big.",                           60.42,  63.48],
-  ["I nodded and explained,",                                   63.48,  66.02],
-  ["Yes, my family lives here, but we also rent out some rooms.",66.02, 71.88],
-  ["I began to introduce the house.",                           71.88,  74.96],
-  ["This is the first floor, I said.",                          74.96,  78.16],
-  ["A small shop rents this space.",                            78.16,  81.16],
-  ["They sell clothes.",                                        81.16,  82.28],
-  ["Then I continued, on the upper floors, there are several rooms.", 82.28, 89.82],
-  ["Some students rent rooms here, and some small families live here too.", 89.82, 95.00],
-  ["Then I said, come, let me show you where my family lives.", 95.00, 100.50],
-  ["We walked upstairs.",                                      100.50, 103.50],
-  ["This is our living room, I explained.",                    103.50, 107.00],
-  ["In the evening, my parents, my sister, and I often sit here and talk.", 107.00, 113.00],
-  ["Then I pointed to another room.",                          113.00, 116.00],
-  ["This is our kitchen.",                                     116.00, 119.10],
-  ["My mom cooks many delicious meals here.",                  119.10, 123.50],
-  ["Over there is our bathroom.",                              123.50, 126.50],
-  ["It's small, but we always keep it clean.",                 126.50, 130.00],
-  ["And we have two bedrooms.",                                130.00, 132.50],
-  ["They are small, but very cozy.",                           132.50, 136.00],
-  ["Near the window, there was a small table with some books.",136.00, 140.00],
-  ["This is my favorite place, I said.",                       140.00, 143.00],
-  ["I like to sit here and read.",                             143.00, 146.00],
-  ["The club owner smiled warmly.",                            146.00, 148.50],
-  ["That sounds like a very peaceful moment.",                 148.50, 153.16],
-  ["After the tour, we sat in the living room and drank some tea.", 153.16, 158.00],
-  ["The club owner said, Rose, you introduced your house very clearly in English.", 158.00, 163.50],
-  ["I laughed a little.",                                      163.50, 165.50],
-  ["I'm still learning, I said, but I like practicing English with real-life things.", 165.50, 171.00],
-  ["She nodded.",                                              171.00, 172.50],
-  ["That's the best way to learn.",                            172.50, 177.40],
-  ["Then she said, next week at the club, maybe everyone can talk about their houses.", 177.40, 183.50],
-  ["My eyes lit up.",                                          183.50, 185.00],
-  ["That sounds fun!",                                         185.00, 186.18],
-  ["And suddenly I realized something.",                       186.18, 189.50],
-  ["Sometimes, the best English lesson is simply sharing your life, your home, and your stories with others.", 189.50, 196.00],
+  ["After the sharing time, the club owner smiled at me.",                              0.00,   5.16],
+  ["Rose, she said, your family sounds interesting.",                                   5.16,   9.84],
+  ["I felt a little shy, but I smiled.",                                                9.84,  13.92],
+  ["Thank you!",                                                                       13.92,  14.94],
+  ["Then she asked, do you live near here?",                                           14.94,  19.54],
+  ["Yes, I said. My house is not very far from the club.",                             19.54,  25.04],
+  ["She laughed softly.",                                                              25.04,  27.06],
+  ["Really? I would love to see your home someday.",                                   27.06,  30.82],
+  ["I thought for a moment.",                                                          30.82,  33.10],
+  ["Then I said, why don't you visit my house this weekend?",                          33.10,  38.44],
+  ["Her eyes lit up.",                                                                 38.44,  40.46],
+  ["That sounds lovely!",                                                              40.46,  42.66],
+  ["On Saturday afternoon, she came to my house.",                                     42.66,  46.08],
+  ["When she arrived, I opened the door and waved.",                                   46.08,  50.50],
+  ["Welcome to my house!",                                                             50.50,  52.64],
+  ["She smiled and said, thank you for inviting me, Rose.",                            52.64,  57.46],
+  ["She looked at the building and said, oh, this house looks quite big.",             57.46,  63.48],
+  ["I nodded and explained, yes, my family lives here, but we also rent out some rooms.", 63.48, 71.88],
+  ["I began to introduce the house.",                                                  71.88,  74.96],
+  ["This is the first floor, I said. A small shop rents this space.",                  74.96,  81.16],
+  ["They sell clothes.",                                                               81.16,  82.28],
+  ["Then I continued. On the upper floors there are several rooms.",                   82.28,  89.82],
+  ["Some students rent rooms here and some small families live here too.",             89.82,  95.50],
+  ["Then I said, come, let me show you where my family lives.",                        95.50, 103.50],
+  ["We walked upstairs.",                                                             103.50, 106.00],
+  ["This is our living room, I explained.",                                           106.00, 110.44],
+  ["In the evening, my parents, my sister, and I often sit here and talk.",           110.44, 116.00],
+  ["Then I pointed to another room. This is our kitchen.",                            116.00, 121.00],
+  ["My mom cooks many delicious meals here.",                                         121.00, 127.66],
+  ["Over there is our bathroom. It's small, but we always keep it clean.",            127.66, 132.00],
+  ["And we have two bedrooms. They are small, but very cozy.",                        132.00, 136.00],
+  ["Near the window, there was a small table with some books.",                       136.00, 140.00],
+  ["This is my favorite place, I said. I like to sit here and read.",                 140.00, 144.74],
+  ["The club owner smiled warmly.",                                                   144.74, 148.00],
+  ["That sounds like a very peaceful moment.",                                        148.00, 153.16],
+  ["After the tour, we sat in the living room and drank some tea.",                   153.16, 158.50],
+  ["The club owner said, Rose, you introduced your house very clearly in English.",   158.50, 163.50],
+  ["I laughed a little.",                                                             163.50, 165.50],
+  ["I'm still learning, I said, but I like practicing English with real-life things.", 165.50, 168.74],
+  ["She nodded. That's the best way to learn.",                                       168.74, 177.40],
+  ["Then she said, next week at the club, maybe everyone can talk about their houses.", 177.40, 183.80],
+  ["My eyes lit up. That sounds fun!",                                                183.80, 186.18],
+  ["And suddenly I realized something.",                                              186.18, 189.00],
+  ["Sometimes, the best English lesson is simply sharing your life, your home, and your stories with others.", 189.00, 196.00],
 ];
 
 // ── State ──────────────────────────────────────────────
@@ -400,6 +393,16 @@ function setSpeed(s, el) {
   document.querySelectorAll('.spd').forEach(b => b.classList.remove('on'));
   el.classList.add('on');
   if (isPlaying) { stopAudio(); setTimeout(playCurrent, 200); }
+}
+
+// ── Toggle script visibility ───────────────────────────
+let scriptVisible = true;
+function toggleScript() {
+  scriptVisible = !scriptVisible;
+  const box = document.getElementById('s-script');
+  const btn = document.getElementById('toggle-script-btn');
+  box.classList.toggle('blurred', !scriptVisible);
+  btn.textContent = scriptVisible ? '👁 Hide script' : '👁 Show script';
 }
 
 // ── Mode ───────────────────────────────────────────────
