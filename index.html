@@ -34,7 +34,7 @@ header{border-bottom:1px solid var(--border);padding:0.85rem 1.5rem;display:flex
 /* MAIN */
 main{max-width:720px;margin:0 auto;padding:1.3rem 1.3rem 4rem}
 
-/* ?? AUDIO PLAYER ?? */
+/* ── AUDIO PLAYER ── */
 .player{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.3rem;margin-bottom:1rem}
 
 .player-top{display:flex;align-items:center;gap:0.85rem;margin-bottom:1rem}
@@ -166,21 +166,21 @@ textarea::placeholder{color:var(--text3)}
   <div class="header-right">
     <div class="topic-chip">Topic 4</div>
     <div class="mode-tabs">
-      <button class="tab active" id="tab-d" onclick="setMode('dictation',this)">?? Dictation</button>
-      <button class="tab" id="tab-s" onclick="setMode('shadowing',this)">?? Shadowing</button>
+      <button class="tab active" id="tab-d" onclick="setMode('dictation',this)">✍️ Dictation</button>
+      <button class="tab" id="tab-s" onclick="setMode('shadowing',this)">🎤 Shadowing</button>
     </div>
   </div>
 </header>
 
 <!-- Audio loads automatically from repo -->
-<audio id="audio" preload="auto" src="Topic 4.wav"></audio>
+<audio id="audio" preload="auto" src="Topic%204.wav"></audio>
 
 <main>
 
   <!-- PLAYER -->
   <div class="player">
     <div class="player-top">
-      <div class="p-icon">??</div>
+      <div class="p-icon">🔊</div>
       <div>
         <div class="p-title">Inviting a Guest Home</div>
         <div class="p-sub" id="p-sub">Loading audio…</div>
@@ -192,12 +192,12 @@ textarea::placeholder{color:var(--text3)}
     </div>
     <!-- DEBUG: show current time -->
     <div id="debug-bar" style="font-size:0.72rem;color:var(--text3);margin-bottom:0.7rem;font-family:monospace;background:var(--card2);padding:0.4rem 0.7rem;border-radius:7px;">
-      ? Audio time: <span id="debug-time">0.00</span>s &nbsp;|&nbsp; Sentence <span id="debug-sent">1</span>: <span id="debug-range">0.00 ? 4.40</span>s
+      ⏱ Audio time: <span id="debug-time">0.00</span>s &nbsp;|&nbsp; Sentence <span id="debug-sent">1</span>: <span id="debug-range">0.00 → 4.40</span>s
     </div>
 
     <div class="controls">
-      <button class="c-btn c-play" id="play-btn" onclick="playCurrent()" disabled>? Play</button>
-      <button class="c-btn c-repeat on" id="rep-btn" onclick="toggleRepeat()">?? Repeat</button>
+      <button class="c-btn c-play" id="play-btn" onclick="playCurrent()" disabled>▶ Play</button>
+      <button class="c-btn c-repeat on" id="rep-btn" onclick="toggleRepeat()">🔁 Repeat</button>
       <div class="speed-row">
         <span class="spd-lbl">Speed:</span>
         <button class="spd" onclick="setSpeed(0.75,this)">0.75×</button>
@@ -221,32 +221,32 @@ textarea::placeholder{color:var(--text3)}
 
     <!-- DICTATION -->
     <div id="d-panel">
-      <div class="card-lbl">?? Listen &amp; type what you hear</div>
+      <div class="card-lbl">✍️ Listen &amp; type what you hear</div>
       <div class="hint-box" id="hint-box"></div>
-      <textarea id="t-in" placeholder="Press ? Play to hear the sentence, then type it here…" rows="3"></textarea>
+      <textarea id="t-in" placeholder="Press ▶ Play to hear the sentence, then type it here…" rows="3"></textarea>
       <div class="fb" id="d-fb"><div class="fb-h" id="d-fb-h"></div><div id="d-fb-b"></div></div>
       <div class="row">
-        <button class="btn btn-outline" id="hint-btn" onclick="doHint()">?? Hint</button>
-        <button class="btn btn-gold f1" id="chk-btn" onclick="doCheck()">Check ?</button>
-        <button class="btn btn-green f1" id="nxt-btn" onclick="doNext()">Next ?</button>
+        <button class="btn btn-outline" id="hint-btn" onclick="doHint()">💡 Hint</button>
+        <button class="btn btn-gold f1" id="chk-btn" onclick="doCheck()">Check ✓</button>
+        <button class="btn btn-green f1" id="nxt-btn" onclick="doNext()">Next →</button>
       </div>
     </div>
 
     <!-- SHADOWING -->
     <div id="s-panel" style="display:none">
       <div class="card-lbl" style="justify-content:space-between">
-        <span>?? Listen, then shadow the speaker</span>
-        <button class="btn-toggle-script" id="toggle-script-btn" onclick="toggleScript()">?? Hide script</button>
+        <span>🎤 Listen, then shadow the speaker</span>
+        <button class="btn-toggle-script" id="toggle-script-btn" onclick="toggleScript()">👁 Hide script</button>
       </div>
       <div class="script-box" id="s-script"></div>
       <div class="mic-area">
-        <div><button class="mic-btn" id="mic-btn" onclick="toggleMic()">??</button></div>
-        <div class="mic-status" id="mic-st">Press ? to hear, then tap mic to repeat</div>
+        <div><button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤</button></div>
+        <div class="mic-status" id="mic-st">Press ▶ to hear, then tap mic to repeat</div>
         <div class="transcript-box" id="transcript-box"></div>
         <div class="fb" id="s-fb"><div class="fb-h" id="s-fb-h"></div></div>
       </div>
       <div class="row" style="justify-content:center;margin-top:1rem">
-        <button class="btn btn-gold f1" onclick="doNext()">Next sentence ?</button>
+        <button class="btn btn-gold f1" onclick="doNext()">Next sentence →</button>
       </div>
     </div>
 
@@ -254,21 +254,21 @@ textarea::placeholder{color:var(--text3)}
 
   <!-- COMPLETE -->
   <div class="complete" id="complete">
-    <div class="c-emoji" id="c-em">??</div>
+    <div class="c-emoji" id="c-em">🎉</div>
     <h2 id="c-ti">Lesson Complete!</h2>
     <p id="c-ms">Great work finishing all the sentences!</p>
     <div class="score-ring"><div class="score-big" id="c-sc">--</div><div class="score-lbl">accuracy</div></div>
     <div class="c-btns">
-      <button class="btn btn-outline" onclick="restart()">?? Try Again</button>
-      <button class="btn btn-gold" onclick="switchMode()">?? Switch Mode</button>
+      <button class="btn btn-outline" onclick="restart()">🔁 Try Again</button>
+      <button class="btn btn-gold" onclick="switchMode()">🔄 Switch Mode</button>
     </div>
   </div>
 
 </main>
 
 <script>
-// ?? Script + Timestamps ????????????????????????????????
-// start = khi câu b?t ??u trong audio, end = khi câu k?t thúc
+// ── Script + Timestamps ────────────────────────────────
+// start = khi câu bắt đầu trong audio, end = khi câu kết thúc
 const SENTENCES = [
   ["After the sharing time, the club owner smiled at me.",                               0.00,   4.40],
   ["Rose, she said, your family sounds interesting.",                                    4.40,   9.24],
@@ -316,7 +316,7 @@ const SENTENCES = [
   ["Sometimes, the best English lesson is simply sharing your life, your home, and your stories with others.", 189.00, 195.54],
 ];
 
-// ?? State ??????????????????????????????????????????????
+// ── State ──────────────────────────────────────────────
 let mode = 'dictation';
 let idx = 0;
 let correct = 0;
@@ -333,15 +333,15 @@ let isRec = false;
 const audio = document.getElementById('audio');
 document.getElementById('prog-num').innerHTML = `1 <small>/ ${SENTENCES.length}</small>`;
 
-// ?? Auto-load Audio ????????????????????????????????????
+// ── Auto-load Audio ────────────────────────────────────
 audio.oncanplay = () => {
   audioLoaded = true;
   document.getElementById('play-btn').disabled = false;
-  document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ? Play`;
+  document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
 };
 
 audio.onerror = () => {
-  document.getElementById('p-sub').textContent = '?? Audio not found. Make sure Topic 4.wav is in the same folder.';
+  document.getElementById('p-sub').textContent = '⚠️ Audio not found. Make sure Topic 4.wav is in the same folder.';
 };
 
 // Debug: update time display in real time
@@ -349,10 +349,10 @@ audio.ontimeupdate = () => {
   document.getElementById('debug-time').textContent = audio.currentTime.toFixed(2);
   document.getElementById('debug-sent').textContent = idx + 1;
   document.getElementById('debug-range').textContent =
-    SENTENCES[idx][1].toFixed(2) + ' ? ' + SENTENCES[idx][2].toFixed(2);
+    SENTENCES[idx][1].toFixed(2) + ' → ' + SENTENCES[idx][2].toFixed(2);
 };
 
-// ?? Play current sentence ??????????????????????????????
+// ── Play current sentence ──────────────────────────────
 function playCurrent() {
   if (!audioLoaded) {
     document.getElementById('upload-btn').style.animation = 'none';
@@ -372,9 +372,9 @@ function playCurrent() {
   isPlaying = true;
 
   document.getElementById('wave').classList.add('on');
-  document.getElementById('play-btn').textContent = '? Stop';
+  document.getElementById('play-btn').textContent = '◼ Stop';
   document.getElementById('play-btn').onclick = stopAudio;
-  document.getElementById('p-sub').textContent = `?? Playing sentence ${idx + 1}…`;
+  document.getElementById('p-sub').textContent = `🔊 Playing sentence ${idx + 1}…`;
 
   // Stop at end time
   stopTimer = setTimeout(() => {
@@ -390,9 +390,9 @@ function stopAudio() {
   audio.pause();
   isPlaying = false;
   document.getElementById('wave').classList.remove('on');
-  document.getElementById('play-btn').textContent = '? Play';
+  document.getElementById('play-btn').textContent = '▶ Play';
   document.getElementById('play-btn').onclick = playCurrent;
-  document.getElementById('p-sub').textContent = `Sentence ${idx + 1} of ${SENTENCES.length} — press ? Play`;
+  document.getElementById('p-sub').textContent = `Sentence ${idx + 1} of ${SENTENCES.length} — press ▶ Play`;
 }
 
 function toggleRepeat() {
@@ -407,17 +407,17 @@ function setSpeed(s, el) {
   if (isPlaying) { stopAudio(); setTimeout(playCurrent, 200); }
 }
 
-// ?? Toggle script visibility ???????????????????????????
+// ── Toggle script visibility ───────────────────────────
 let scriptVisible = true;
 function toggleScript() {
   scriptVisible = !scriptVisible;
   const box = document.getElementById('s-script');
   const btn = document.getElementById('toggle-script-btn');
   box.classList.toggle('blurred', !scriptVisible);
-  btn.textContent = scriptVisible ? '?? Hide script' : '?? Show script';
+  btn.textContent = scriptVisible ? '👁 Hide script' : '👁 Show script';
 }
 
-// ?? Mode ???????????????????????????????????????????????
+// ── Mode ───────────────────────────────────────────────
 function setMode(m, el) {
   mode = m;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -431,7 +431,7 @@ function switchMode() {
   mode = o; restart();
 }
 
-// ?? Render ?????????????????????????????????????????????
+// ── Render ─────────────────────────────────────────────
 function render() {
   if (idx >= SENTENCES.length) { showComplete(); return; }
   stopAudio();
@@ -439,7 +439,7 @@ function render() {
   const pct = Math.round(idx / SENTENCES.length * 100);
   document.getElementById('prog-fill').style.width = pct + '%';
   document.getElementById('prog-num').innerHTML = `${idx + 1} <small>/ ${SENTENCES.length}</small>`;
-  document.getElementById('p-sub').textContent = `Sentence ${idx + 1} of ${SENTENCES.length} — press ? Play`;
+  document.getElementById('p-sub').textContent = `Sentence ${idx + 1} of ${SENTENCES.length} — press ▶ Play`;
 
   answered = false; hintLevel = 0;
   const card = document.getElementById('practice');
@@ -463,15 +463,15 @@ function render() {
     document.getElementById('transcript-box').style.display = 'none';
     document.getElementById('transcript-box').textContent = '';
     document.getElementById('s-fb').style.display = 'none';
-    document.getElementById('mic-st').textContent = 'Press ? to hear, then tap mic to repeat';
+    document.getElementById('mic-st').textContent = 'Press ▶ to hear, then tap mic to repeat';
     document.getElementById('mic-st').className = 'mic-status';
     document.getElementById('mic-btn').className = 'mic-btn';
-    document.getElementById('mic-btn').textContent = '??';
+    document.getElementById('mic-btn').textContent = '🎤';
     if (isRec) stopRec();
   }
 }
 
-// ?? Dictation ??????????????????????????????????????????
+// ── Dictation ──────────────────────────────────────────
 function norm(s) {
   return s.toLowerCase().replace(/[.,!?;:'"—–\-]/g, '').replace(/\s+/g, ' ').trim();
 }
@@ -483,7 +483,7 @@ function doHint() {
   if (hintLevel === 1) h = words.length + ' words';
   else h = words.map(w => w[0] + '_'.repeat(Math.max(w.length - 1, 1))).join('  ');
   const el = document.getElementById('hint-box');
-  el.textContent = '?? ' + h; el.style.display = 'block';
+  el.textContent = '💡 ' + h; el.style.display = 'block';
   if (hintLevel >= 2) document.getElementById('hint-btn').disabled = true;
 }
 
@@ -502,7 +502,7 @@ function doCheck() {
 
   if (perfect) {
     fb.className = 'fb ok';
-    head.textContent = '? Perfect! Well done!';
+    head.textContent = '✅ Perfect! Well done!';
     body.innerHTML = '';
     correct++;
     answered = true;
@@ -510,7 +510,7 @@ function doCheck() {
     document.getElementById('nxt-btn').style.display = 'flex';
   } else {
     fb.className = 'fb bad';
-    head.textContent = '? Not quite — listen again:';
+    head.textContent = '❌ Not quite — listen again:';
     let h = ''; const max = Math.max(iw.length, tw.length);
     for (let i = 0; i < max; i++) {
       const a = iw[i], b = tw[i];
@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ?? Shadowing ??????????????????????????????????????????
+// ── Shadowing ──────────────────────────────────────────
 function toggleMic() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { alert('Speech recognition requires Google Chrome.'); return; }
@@ -543,8 +543,8 @@ function startRec() {
   recog = new SR(); recog.lang = 'en-US'; recog.interimResults = true;
   isRec = true;
   document.getElementById('mic-btn').className = 'mic-btn on';
-  document.getElementById('mic-btn').textContent = '?';
-  document.getElementById('mic-st').textContent = '?? Recording… speak now';
+  document.getElementById('mic-btn').textContent = '⏹';
+  document.getElementById('mic-st').textContent = '🔴 Recording… speak now';
   document.getElementById('mic-st').className = 'mic-status live';
   const tb = document.getElementById('transcript-box');
   tb.style.display = 'block'; tb.textContent = '…listening…';
@@ -561,7 +561,7 @@ function startRec() {
   recog.onend = () => {
     isRec = false;
     document.getElementById('mic-btn').className = 'mic-btn';
-    document.getElementById('mic-btn').textContent = '??';
+    document.getElementById('mic-btn').textContent = '🎤';
     document.getElementById('mic-st').textContent = 'Done. Tap mic to record again.';
     document.getElementById('mic-st').className = 'mic-status';
     if (finalText) analyzeShad(finalText);
@@ -569,7 +569,7 @@ function startRec() {
   recog.onerror = e => {
     isRec = false;
     document.getElementById('mic-btn').className = 'mic-btn';
-    document.getElementById('mic-btn').textContent = '??';
+    document.getElementById('mic-btn').textContent = '🎤';
     const msgs = { 'no-speech': 'No speech detected.', 'not-allowed': 'Mic access denied.', 'network': 'Network error.' };
     document.getElementById('mic-st').textContent = msgs[e.error] || 'Error: ' + e.error;
     document.getElementById('mic-st').className = 'mic-status';
@@ -586,15 +586,15 @@ function analyzeShad(transcript) {
   const fb = document.getElementById('s-fb');
   const head = document.getElementById('s-fb-h');
   fb.style.display = 'block';
-  if (pct >= 80)      { fb.className = 'fb ok';  head.textContent = `? Excellent! ${pct}% match`; correct++; }
-  else if (pct >= 50) { fb.className = 'fb bad';  head.textContent = `?? ${pct}% — listen again and try once more.`; }
-  else                { fb.className = 'fb bad'; head.textContent = `?? ${pct}% — slow down and focus on each word.`; }
+  if (pct >= 80)      { fb.className = 'fb ok';  head.textContent = `✅ Excellent! ${pct}% match`; correct++; }
+  else if (pct >= 50) { fb.className = 'fb bad';  head.textContent = `🟡 ${pct}% — listen again and try once more.`; }
+  else                { fb.className = 'fb bad'; head.textContent = `🔁 ${pct}% — slow down and focus on each word.`; }
 }
 
-// ?? Navigation ?????????????????????????????????????????
+// ── Navigation ─────────────────────────────────────────
 function doNext() { idx++; render(); }
 
-// ?? Complete ???????????????????????????????????????????
+// ── Complete ───────────────────────────────────────────
 function showComplete() {
   stopAudio();
   document.getElementById('practice').style.display = 'none';
@@ -603,10 +603,10 @@ function showComplete() {
   document.getElementById('prog-num').innerHTML = `${SENTENCES.length} <small>/ ${SENTENCES.length}</small>`;
   const pct = Math.round(correct / SENTENCES.length * 100);
   document.getElementById('c-sc').textContent = pct + '%';
-  let e = '??', t = 'Lesson Complete!', m = 'Great work finishing all the sentences!';
-  if (pct >= 90) { e = '??'; t = 'Outstanding!'; m = 'Near-perfect — you absolutely nailed it!' }
-  else if (pct >= 70) { e = '??'; t = 'Well done!'; m = 'Solid effort! Aim for 90%+ next time.' }
-  else if (pct < 40) { e = '??'; t = 'Keep going!'; m = "Tough lesson — try again, you'll improve!" }
+  let e = '🎉', t = 'Lesson Complete!', m = 'Great work finishing all the sentences!';
+  if (pct >= 90) { e = '🏆'; t = 'Outstanding!'; m = 'Near-perfect — you absolutely nailed it!' }
+  else if (pct >= 70) { e = '🌟'; t = 'Well done!'; m = 'Solid effort! Aim for 90%+ next time.' }
+  else if (pct < 40) { e = '💪'; t = 'Keep going!'; m = "Tough lesson — try again, you'll improve!" }
   document.getElementById('c-em').textContent = e;
   document.getElementById('c-ti').textContent = t;
   document.getElementById('c-ms').textContent = m;
