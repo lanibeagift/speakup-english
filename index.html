@@ -169,8 +169,8 @@ textarea::placeholder{color:var(--text3)}
   </div>
 </header>
 
-<!-- Hidden audio element -->
-<audio id="audio" preload="auto"></audio>
+<!-- Audio loads automatically from repo -->
+<audio id="audio" preload="auto" src="Topic 4.wav"></audio>
 
 <main>
 
@@ -180,7 +180,7 @@ textarea::placeholder{color:var(--text3)}
       <div class="p-icon">🔊</div>
       <div>
         <div class="p-title">Inviting a Guest Home</div>
-        <div class="p-sub" id="p-sub">Load audio file to begin</div>
+        <div class="p-sub" id="p-sub">Loading audio…</div>
       </div>
     </div>
 
@@ -197,17 +197,6 @@ textarea::placeholder{color:var(--text3)}
         <button class="spd on" onclick="setSpeed(1.0,this)">1×</button>
         <button class="spd" onclick="setSpeed(1.25,this)">1.25×</button>
       </div>
-    </div>
-
-    <!-- Upload audio file -->
-    <div class="upload-row">
-      <div class="upload-lbl">
-        <strong>📂 Load your audio file:</strong> Upload <code>Topic_4.wav</code> (or MP3) from your computer. The file stays on your device — nothing is uploaded anywhere.
-      </div>
-      <button class="btn-upload" id="upload-btn" onclick="document.getElementById('file-input').click()">
-        📁 Choose file
-      </button>
-      <input type="file" id="file-input" accept="audio/*" onchange="loadAudio(this)"/>
     </div>
   </div>
 
@@ -227,7 +216,7 @@ textarea::placeholder{color:var(--text3)}
     <div id="d-panel">
       <div class="card-lbl">✍️ Listen &amp; type what you hear</div>
       <div class="hint-box" id="hint-box"></div>
-      <textarea id="t-in" placeholder="Load audio → press ▶ Play → type what you hear…" rows="3"></textarea>
+      <textarea id="t-in" placeholder="Press ▶ Play to hear the sentence, then type it here…" rows="3"></textarea>
       <div class="fb" id="d-fb"><div class="fb-h" id="d-fb-h"></div><div id="d-fb-b"></div></div>
       <div class="row">
         <button class="btn btn-outline" id="hint-btn" onclick="doHint()">💡 Hint</button>
@@ -341,29 +330,22 @@ let autoRepeat = true;
 let isPlaying = false;
 let stopTimer = null;
 let audioLoaded = false;
-
-// Shadowing
 let recog = null;
 let isRec = false;
 
 const audio = document.getElementById('audio');
 document.getElementById('prog-num').innerHTML = `1 <small>/ ${SENTENCES.length}</small>`;
 
-// ── Load Audio ─────────────────────────────────────────
-function loadAudio(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const url = URL.createObjectURL(file);
-  audio.src = url;
-  audio.load();
-  audio.oncanplay = () => {
-    audioLoaded = true;
-    document.getElementById('play-btn').disabled = false;
-    document.getElementById('upload-btn').textContent = '✅ ' + file.name;
-    document.getElementById('upload-btn').classList.add('loaded');
-    document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
-  };
-}
+// ── Auto-load Audio ────────────────────────────────────
+audio.oncanplay = () => {
+  audioLoaded = true;
+  document.getElementById('play-btn').disabled = false;
+  document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
+};
+
+audio.onerror = () => {
+  document.getElementById('p-sub').textContent = '⚠️ Audio not found. Make sure Topic 4.wav is in the same folder.';
+};
 
 // ── Play current sentence ──────────────────────────────
 function playCurrent() {
