@@ -34,7 +34,7 @@ header{border-bottom:1px solid var(--border);padding:0.85rem 1.5rem;display:flex
 /* MAIN */
 main{max-width:720px;margin:0 auto;padding:1.3rem 1.3rem 4rem}
 
-/* ── AUDIO PLAYER ── */
+/* ?? AUDIO PLAYER ?? */
 .player{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.3rem;margin-bottom:1rem}
 
 .player-top{display:flex;align-items:center;gap:0.85rem;margin-bottom:1rem}
@@ -166,8 +166,8 @@ textarea::placeholder{color:var(--text3)}
   <div class="header-right">
     <div class="topic-chip">Topic 4</div>
     <div class="mode-tabs">
-      <button class="tab active" id="tab-d" onclick="setMode('dictation',this)">✍️ Dictation</button>
-      <button class="tab" id="tab-s" onclick="setMode('shadowing',this)">🎤 Shadowing</button>
+      <button class="tab active" id="tab-d" onclick="setMode('dictation',this)">?? Dictation</button>
+      <button class="tab" id="tab-s" onclick="setMode('shadowing',this)">?? Shadowing</button>
     </div>
   </div>
 </header>
@@ -180,7 +180,7 @@ textarea::placeholder{color:var(--text3)}
   <!-- PLAYER -->
   <div class="player">
     <div class="player-top">
-      <div class="p-icon">🔊</div>
+      <div class="p-icon">??</div>
       <div>
         <div class="p-title">Inviting a Guest Home</div>
         <div class="p-sub" id="p-sub">Loading audio…</div>
@@ -190,10 +190,14 @@ textarea::placeholder{color:var(--text3)}
     <div class="wave" id="wave">
       <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
     </div>
+    <!-- DEBUG: show current time -->
+    <div id="debug-bar" style="font-size:0.72rem;color:var(--text3);margin-bottom:0.7rem;font-family:monospace;background:var(--card2);padding:0.4rem 0.7rem;border-radius:7px;">
+      ? Audio time: <span id="debug-time">0.00</span>s &nbsp;|&nbsp; Sentence <span id="debug-sent">1</span>: <span id="debug-range">0.00 ? 4.40</span>s
+    </div>
 
     <div class="controls">
-      <button class="c-btn c-play" id="play-btn" onclick="playCurrent()" disabled>▶ Play</button>
-      <button class="c-btn c-repeat on" id="rep-btn" onclick="toggleRepeat()">🔁 Repeat</button>
+      <button class="c-btn c-play" id="play-btn" onclick="playCurrent()" disabled>? Play</button>
+      <button class="c-btn c-repeat on" id="rep-btn" onclick="toggleRepeat()">?? Repeat</button>
       <div class="speed-row">
         <span class="spd-lbl">Speed:</span>
         <button class="spd" onclick="setSpeed(0.75,this)">0.75×</button>
@@ -217,32 +221,32 @@ textarea::placeholder{color:var(--text3)}
 
     <!-- DICTATION -->
     <div id="d-panel">
-      <div class="card-lbl">✍️ Listen &amp; type what you hear</div>
+      <div class="card-lbl">?? Listen &amp; type what you hear</div>
       <div class="hint-box" id="hint-box"></div>
-      <textarea id="t-in" placeholder="Press ▶ Play to hear the sentence, then type it here…" rows="3"></textarea>
+      <textarea id="t-in" placeholder="Press ? Play to hear the sentence, then type it here…" rows="3"></textarea>
       <div class="fb" id="d-fb"><div class="fb-h" id="d-fb-h"></div><div id="d-fb-b"></div></div>
       <div class="row">
-        <button class="btn btn-outline" id="hint-btn" onclick="doHint()">💡 Hint</button>
-        <button class="btn btn-gold f1" id="chk-btn" onclick="doCheck()">Check ✓</button>
-        <button class="btn btn-green f1" id="nxt-btn" onclick="doNext()">Next →</button>
+        <button class="btn btn-outline" id="hint-btn" onclick="doHint()">?? Hint</button>
+        <button class="btn btn-gold f1" id="chk-btn" onclick="doCheck()">Check ?</button>
+        <button class="btn btn-green f1" id="nxt-btn" onclick="doNext()">Next ?</button>
       </div>
     </div>
 
     <!-- SHADOWING -->
     <div id="s-panel" style="display:none">
       <div class="card-lbl" style="justify-content:space-between">
-        <span>🎤 Listen, then shadow the speaker</span>
-        <button class="btn-toggle-script" id="toggle-script-btn" onclick="toggleScript()">👁 Hide script</button>
+        <span>?? Listen, then shadow the speaker</span>
+        <button class="btn-toggle-script" id="toggle-script-btn" onclick="toggleScript()">?? Hide script</button>
       </div>
       <div class="script-box" id="s-script"></div>
       <div class="mic-area">
-        <div><button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤</button></div>
-        <div class="mic-status" id="mic-st">Press ▶ to hear, then tap mic to repeat</div>
+        <div><button class="mic-btn" id="mic-btn" onclick="toggleMic()">??</button></div>
+        <div class="mic-status" id="mic-st">Press ? to hear, then tap mic to repeat</div>
         <div class="transcript-box" id="transcript-box"></div>
         <div class="fb" id="s-fb"><div class="fb-h" id="s-fb-h"></div></div>
       </div>
       <div class="row" style="justify-content:center;margin-top:1rem">
-        <button class="btn btn-gold f1" onclick="doNext()">Next sentence →</button>
+        <button class="btn btn-gold f1" onclick="doNext()">Next sentence ?</button>
       </div>
     </div>
 
@@ -250,68 +254,69 @@ textarea::placeholder{color:var(--text3)}
 
   <!-- COMPLETE -->
   <div class="complete" id="complete">
-    <div class="c-emoji" id="c-em">🎉</div>
+    <div class="c-emoji" id="c-em">??</div>
     <h2 id="c-ti">Lesson Complete!</h2>
     <p id="c-ms">Great work finishing all the sentences!</p>
     <div class="score-ring"><div class="score-big" id="c-sc">--</div><div class="score-lbl">accuracy</div></div>
     <div class="c-btns">
-      <button class="btn btn-outline" onclick="restart()">🔁 Try Again</button>
-      <button class="btn btn-gold" onclick="switchMode()">🔄 Switch Mode</button>
+      <button class="btn btn-outline" onclick="restart()">?? Try Again</button>
+      <button class="btn btn-gold" onclick="switchMode()">?? Switch Mode</button>
     </div>
   </div>
 
 </main>
 
 <script>
-// ── Script + Timestamps ────────────────────────────────
+// ?? Script + Timestamps ????????????????????????????????
+// start = khi câu b?t ??u trong audio, end = khi câu k?t thúc
 const SENTENCES = [
-  ["After the sharing time, the club owner smiled at me.",                              0.00,   4.40],
-  ["Rose, she said, your family sounds interesting.",                                   5.16,   9.24],
-  ["I felt a little shy, but I smiled.",                                                9.84,  13.28],
-  ["Thank you!",                                                                       13.92,  14.62],
-  ["Then she asked, do you live near here?",                                           14.94,  18.82],
-  ["Yes, I said. My house is not very far from the club.",                             19.54,  24.40],
-  ["She laughed softly.",                                                              25.04,  26.42],
-  ["Really? I would love to see your home someday.",                                   27.06,  30.26],
-  ["I thought for a moment.",                                                          30.82,  32.56],
-  ["Then I said, why don't you visit my house this weekend?",                          33.10,  37.64],
-  ["Her eyes lit up.",                                                                 38.44,  40.00],
-  ["That sounds lovely!",                                                              40.46,  41.78],
-  ["On Saturday afternoon, she came to my house.",                                     42.66,  46.08],
-  ["When she arrived, I opened the door and waved.",                                   46.08,  50.02],
-  ["Welcome to my house!",                                                             50.50,  52.02],
-  ["She smiled and said, thank you for inviting me, Rose.",                            52.64,  56.88],
-  ["She looked at the building and said, oh, this house looks quite big.",             57.46,  63.14],
-  ["I nodded and explained, yes, my family lives here, but we also rent out some rooms.", 63.48, 71.14],
-  ["I began to introduce the house.",                                                  71.88,  74.28],
-  ["This is the first floor, I said. A small shop rents this space.",                  74.96,  80.60],
-  ["They sell clothes.",                                                               81.16,  82.28],
-  ["Then I continued. On the upper floors there are several rooms.",                   82.28,  89.82],
-  ["Some students rent rooms here and some small families live here too.",             89.82,  96.00],
-  ["Then I said, come, let me show you where my family lives.",                        96.00, 103.50],
-  ["We walked upstairs.",                                                             103.50, 106.00],
-  ["This is our living room, I explained.",                                           106.00, 110.44],
-  ["In the evening, my parents, my sister, and I often sit here and talk.",           110.44, 116.00],
-  ["Then I pointed to another room. This is our kitchen.",                            116.00, 121.00],
-  ["My mom cooks many delicious meals here.",                                         121.00, 127.66],
-  ["Over there is our bathroom. It's small, but we always keep it clean.",            127.66, 132.00],
-  ["And we have two bedrooms. They are small, but very cozy.",                        132.00, 136.00],
-  ["Near the window, there was a small table with some books.",                       136.00, 140.00],
-  ["This is my favorite place, I said. I like to sit here and read.",                 140.00, 144.74],
-  ["The club owner smiled warmly.",                                                   144.74, 148.00],
-  ["That sounds like a very peaceful moment.",                                        148.00, 153.16],
-  ["After the tour, we sat in the living room and drank some tea.",                   153.16, 158.50],
-  ["The club owner said, Rose, you introduced your house very clearly in English.",   158.50, 163.50],
-  ["I laughed a little.",                                                             163.50, 165.50],
+  ["After the sharing time, the club owner smiled at me.",                               0.00,   4.40],
+  ["Rose, she said, your family sounds interesting.",                                    4.40,   9.24],
+  ["I felt a little shy, but I smiled.",                                                 9.24,  13.28],
+  ["Thank you!",                                                                        13.28,  14.62],
+  ["Then she asked, do you live near here?",                                            14.62,  18.82],
+  ["Yes, I said. My house is not very far from the club.",                              18.82,  24.40],
+  ["She laughed softly.",                                                               24.40,  26.42],
+  ["Really? I would love to see your home someday.",                                    26.42,  30.26],
+  ["I thought for a moment.",                                                           30.26,  32.56],
+  ["Then I said, why don't you visit my house this weekend?",                           32.56,  37.64],
+  ["Her eyes lit up.",                                                                  37.64,  40.00],
+  ["That sounds lovely!",                                                               40.00,  41.78],
+  ["On Saturday afternoon, she came to my house.",                                      41.78,  46.08],
+  ["When she arrived, I opened the door and waved.",                                    46.08,  50.02],
+  ["Welcome to my house!",                                                              50.02,  52.02],
+  ["She smiled and said, thank you for inviting me, Rose.",                             52.02,  56.88],
+  ["She looked at the building and said, oh, this house looks quite big.",              56.88,  63.14],
+  ["I nodded and explained, yes, my family lives here, but we also rent out some rooms.", 63.14, 71.14],
+  ["I began to introduce the house.",                                                   71.14,  74.28],
+  ["This is the first floor, I said. A small shop rents this space.",                   74.28,  80.60],
+  ["They sell clothes.",                                                                80.60,  82.28],
+  ["Then I continued. On the upper floors there are several rooms.",                    82.28,  89.82],
+  ["Some students rent rooms here and some small families live here too.",              89.82,  96.00],
+  ["Then I said, come, let me show you where my family lives.",                         96.00, 103.50],
+  ["We walked upstairs.",                                                              103.50, 106.00],
+  ["This is our living room, I explained.",                                            106.00, 110.44],
+  ["In the evening, my parents, my sister, and I often sit here and talk.",            110.44, 116.00],
+  ["Then I pointed to another room. This is our kitchen.",                             116.00, 121.00],
+  ["My mom cooks many delicious meals here.",                                          121.00, 127.66],
+  ["Over there is our bathroom. It's small, but we always keep it clean.",             127.66, 132.00],
+  ["And we have two bedrooms. They are small, but very cozy.",                         132.00, 136.00],
+  ["Near the window, there was a small table with some books.",                        136.00, 140.00],
+  ["This is my favorite place, I said. I like to sit here and read.",                  140.00, 144.74],
+  ["The club owner smiled warmly.",                                                    144.74, 148.00],
+  ["That sounds like a very peaceful moment.",                                         148.00, 153.16],
+  ["After the tour, we sat in the living room and drank some tea.",                    153.16, 158.50],
+  ["The club owner said, Rose, you introduced your house very clearly in English.",    158.50, 163.50],
+  ["I laughed a little.",                                                              163.50, 165.50],
   ["I'm still learning, I said, but I like practicing English with real-life things.", 165.50, 168.74],
-  ["She nodded. That's the best way to learn.",                                       168.74, 177.40],
+  ["She nodded. That's the best way to learn.",                                        168.74, 177.40],
   ["Then she said, next week at the club, maybe everyone can talk about their houses.", 177.40, 183.80],
-  ["My eyes lit up. That sounds fun!",                                                183.80, 186.18],
-  ["And suddenly I realized something.",                                              186.18, 189.00],
+  ["My eyes lit up. That sounds fun!",                                                 183.80, 186.18],
+  ["And suddenly I realized something.",                                               186.18, 189.00],
   ["Sometimes, the best English lesson is simply sharing your life, your home, and your stories with others.", 189.00, 195.54],
 ];
 
-// ── State ──────────────────────────────────────────────
+// ?? State ??????????????????????????????????????????????
 let mode = 'dictation';
 let idx = 0;
 let correct = 0;
@@ -328,18 +333,26 @@ let isRec = false;
 const audio = document.getElementById('audio');
 document.getElementById('prog-num').innerHTML = `1 <small>/ ${SENTENCES.length}</small>`;
 
-// ── Auto-load Audio ────────────────────────────────────
+// ?? Auto-load Audio ????????????????????????????????????
 audio.oncanplay = () => {
   audioLoaded = true;
   document.getElementById('play-btn').disabled = false;
-  document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
+  document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ? Play`;
 };
 
 audio.onerror = () => {
-  document.getElementById('p-sub').textContent = '⚠️ Audio not found. Make sure Topic 4.wav is in the same folder.';
+  document.getElementById('p-sub').textContent = '?? Audio not found. Make sure Topic 4.wav is in the same folder.';
 };
 
-// ── Play current sentence ──────────────────────────────
+// Debug: update time display in real time
+audio.ontimeupdate = () => {
+  document.getElementById('debug-time').textContent = audio.currentTime.toFixed(2);
+  document.getElementById('debug-sent').textContent = idx + 1;
+  document.getElementById('debug-range').textContent =
+    SENTENCES[idx][1].toFixed(2) + ' ? ' + SENTENCES[idx][2].toFixed(2);
+};
+
+// ?? Play current sentence ??????????????????????????????
 function playCurrent() {
   if (!audioLoaded) {
     document.getElementById('upload-btn').style.animation = 'none';
@@ -359,9 +372,9 @@ function playCurrent() {
   isPlaying = true;
 
   document.getElementById('wave').classList.add('on');
-  document.getElementById('play-btn').textContent = '◼ Stop';
+  document.getElementById('play-btn').textContent = '? Stop';
   document.getElementById('play-btn').onclick = stopAudio;
-  document.getElementById('p-sub').textContent = `🔊 Playing sentence ${idx + 1}…`;
+  document.getElementById('p-sub').textContent = `?? Playing sentence ${idx + 1}…`;
 
   // Stop at end time
   stopTimer = setTimeout(() => {
@@ -377,9 +390,9 @@ function stopAudio() {
   audio.pause();
   isPlaying = false;
   document.getElementById('wave').classList.remove('on');
-  document.getElementById('play-btn').textContent = '▶ Play';
+  document.getElementById('play-btn').textContent = '? Play';
   document.getElementById('play-btn').onclick = playCurrent;
-  document.getElementById('p-sub').textContent = `Sentence ${idx + 1} of ${SENTENCES.length} — press ▶ Play`;
+  document.getElementById('p-sub').textContent = `Sentence ${idx + 1} of ${SENTENCES.length} — press ? Play`;
 }
 
 function toggleRepeat() {
@@ -394,17 +407,17 @@ function setSpeed(s, el) {
   if (isPlaying) { stopAudio(); setTimeout(playCurrent, 200); }
 }
 
-// ── Toggle script visibility ───────────────────────────
+// ?? Toggle script visibility ???????????????????????????
 let scriptVisible = true;
 function toggleScript() {
   scriptVisible = !scriptVisible;
   const box = document.getElementById('s-script');
   const btn = document.getElementById('toggle-script-btn');
   box.classList.toggle('blurred', !scriptVisible);
-  btn.textContent = scriptVisible ? '👁 Hide script' : '👁 Show script';
+  btn.textContent = scriptVisible ? '?? Hide script' : '?? Show script';
 }
 
-// ── Mode ───────────────────────────────────────────────
+// ?? Mode ???????????????????????????????????????????????
 function setMode(m, el) {
   mode = m;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -418,7 +431,7 @@ function switchMode() {
   mode = o; restart();
 }
 
-// ── Render ─────────────────────────────────────────────
+// ?? Render ?????????????????????????????????????????????
 function render() {
   if (idx >= SENTENCES.length) { showComplete(); return; }
   stopAudio();
@@ -426,7 +439,7 @@ function render() {
   const pct = Math.round(idx / SENTENCES.length * 100);
   document.getElementById('prog-fill').style.width = pct + '%';
   document.getElementById('prog-num').innerHTML = `${idx + 1} <small>/ ${SENTENCES.length}</small>`;
-  document.getElementById('p-sub').textContent = `Sentence ${idx + 1} of ${SENTENCES.length} — press ▶ Play`;
+  document.getElementById('p-sub').textContent = `Sentence ${idx + 1} of ${SENTENCES.length} — press ? Play`;
 
   answered = false; hintLevel = 0;
   const card = document.getElementById('practice');
@@ -450,15 +463,15 @@ function render() {
     document.getElementById('transcript-box').style.display = 'none';
     document.getElementById('transcript-box').textContent = '';
     document.getElementById('s-fb').style.display = 'none';
-    document.getElementById('mic-st').textContent = 'Press ▶ to hear, then tap mic to repeat';
+    document.getElementById('mic-st').textContent = 'Press ? to hear, then tap mic to repeat';
     document.getElementById('mic-st').className = 'mic-status';
     document.getElementById('mic-btn').className = 'mic-btn';
-    document.getElementById('mic-btn').textContent = '🎤';
+    document.getElementById('mic-btn').textContent = '??';
     if (isRec) stopRec();
   }
 }
 
-// ── Dictation ──────────────────────────────────────────
+// ?? Dictation ??????????????????????????????????????????
 function norm(s) {
   return s.toLowerCase().replace(/[.,!?;:'"—–\-]/g, '').replace(/\s+/g, ' ').trim();
 }
@@ -470,7 +483,7 @@ function doHint() {
   if (hintLevel === 1) h = words.length + ' words';
   else h = words.map(w => w[0] + '_'.repeat(Math.max(w.length - 1, 1))).join('  ');
   const el = document.getElementById('hint-box');
-  el.textContent = '💡 ' + h; el.style.display = 'block';
+  el.textContent = '?? ' + h; el.style.display = 'block';
   if (hintLevel >= 2) document.getElementById('hint-btn').disabled = true;
 }
 
@@ -489,7 +502,7 @@ function doCheck() {
 
   if (perfect) {
     fb.className = 'fb ok';
-    head.textContent = '✅ Perfect! Well done!';
+    head.textContent = '? Perfect! Well done!';
     body.innerHTML = '';
     correct++;
     answered = true;
@@ -497,7 +510,7 @@ function doCheck() {
     document.getElementById('nxt-btn').style.display = 'flex';
   } else {
     fb.className = 'fb bad';
-    head.textContent = '❌ Not quite — listen again:';
+    head.textContent = '? Not quite — listen again:';
     let h = ''; const max = Math.max(iw.length, tw.length);
     for (let i = 0; i < max; i++) {
       const a = iw[i], b = tw[i];
@@ -518,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ── Shadowing ──────────────────────────────────────────
+// ?? Shadowing ??????????????????????????????????????????
 function toggleMic() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { alert('Speech recognition requires Google Chrome.'); return; }
@@ -530,8 +543,8 @@ function startRec() {
   recog = new SR(); recog.lang = 'en-US'; recog.interimResults = true;
   isRec = true;
   document.getElementById('mic-btn').className = 'mic-btn on';
-  document.getElementById('mic-btn').textContent = '⏹';
-  document.getElementById('mic-st').textContent = '🔴 Recording… speak now';
+  document.getElementById('mic-btn').textContent = '?';
+  document.getElementById('mic-st').textContent = '?? Recording… speak now';
   document.getElementById('mic-st').className = 'mic-status live';
   const tb = document.getElementById('transcript-box');
   tb.style.display = 'block'; tb.textContent = '…listening…';
@@ -548,7 +561,7 @@ function startRec() {
   recog.onend = () => {
     isRec = false;
     document.getElementById('mic-btn').className = 'mic-btn';
-    document.getElementById('mic-btn').textContent = '🎤';
+    document.getElementById('mic-btn').textContent = '??';
     document.getElementById('mic-st').textContent = 'Done. Tap mic to record again.';
     document.getElementById('mic-st').className = 'mic-status';
     if (finalText) analyzeShad(finalText);
@@ -556,7 +569,7 @@ function startRec() {
   recog.onerror = e => {
     isRec = false;
     document.getElementById('mic-btn').className = 'mic-btn';
-    document.getElementById('mic-btn').textContent = '🎤';
+    document.getElementById('mic-btn').textContent = '??';
     const msgs = { 'no-speech': 'No speech detected.', 'not-allowed': 'Mic access denied.', 'network': 'Network error.' };
     document.getElementById('mic-st').textContent = msgs[e.error] || 'Error: ' + e.error;
     document.getElementById('mic-st').className = 'mic-status';
@@ -573,15 +586,15 @@ function analyzeShad(transcript) {
   const fb = document.getElementById('s-fb');
   const head = document.getElementById('s-fb-h');
   fb.style.display = 'block';
-  if (pct >= 80)      { fb.className = 'fb ok';  head.textContent = `✅ Excellent! ${pct}% match`; correct++; }
-  else if (pct >= 50) { fb.className = 'fb bad';  head.textContent = `🟡 ${pct}% — listen again and try once more.`; }
-  else                { fb.className = 'fb bad'; head.textContent = `🔁 ${pct}% — slow down and focus on each word.`; }
+  if (pct >= 80)      { fb.className = 'fb ok';  head.textContent = `? Excellent! ${pct}% match`; correct++; }
+  else if (pct >= 50) { fb.className = 'fb bad';  head.textContent = `?? ${pct}% — listen again and try once more.`; }
+  else                { fb.className = 'fb bad'; head.textContent = `?? ${pct}% — slow down and focus on each word.`; }
 }
 
-// ── Navigation ─────────────────────────────────────────
+// ?? Navigation ?????????????????????????????????????????
 function doNext() { idx++; render(); }
 
-// ── Complete ───────────────────────────────────────────
+// ?? Complete ???????????????????????????????????????????
 function showComplete() {
   stopAudio();
   document.getElementById('practice').style.display = 'none';
@@ -590,10 +603,10 @@ function showComplete() {
   document.getElementById('prog-num').innerHTML = `${SENTENCES.length} <small>/ ${SENTENCES.length}</small>`;
   const pct = Math.round(correct / SENTENCES.length * 100);
   document.getElementById('c-sc').textContent = pct + '%';
-  let e = '🎉', t = 'Lesson Complete!', m = 'Great work finishing all the sentences!';
-  if (pct >= 90) { e = '🏆'; t = 'Outstanding!'; m = 'Near-perfect — you absolutely nailed it!' }
-  else if (pct >= 70) { e = '🌟'; t = 'Well done!'; m = 'Solid effort! Aim for 90%+ next time.' }
-  else if (pct < 40) { e = '💪'; t = 'Keep going!'; m = "Tough lesson — try again, you'll improve!" }
+  let e = '??', t = 'Lesson Complete!', m = 'Great work finishing all the sentences!';
+  if (pct >= 90) { e = '??'; t = 'Outstanding!'; m = 'Near-perfect — you absolutely nailed it!' }
+  else if (pct >= 70) { e = '??'; t = 'Well done!'; m = 'Solid effort! Aim for 90%+ next time.' }
+  else if (pct < 40) { e = '??'; t = 'Keep going!'; m = "Tough lesson — try again, you'll improve!" }
   document.getElementById('c-em').textContent = e;
   document.getElementById('c-ti').textContent = t;
   document.getElementById('c-ms').textContent = m;
