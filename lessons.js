@@ -13,7 +13,7 @@ const LESSONS_DATA = {
       ["Welcome! Why don't you go ahead and introduce yourself?",                       15.62, 19.10],
       ["Of course. Right away.",                                                        19.10, 21.22],
       ["I took a deep breath.",                                                         21.22, 23.28],
-      ["Hi everyone, I'm Nga.",                                                         23.28, 25.70],
+      ["Hi everyone, I'm Rose.",                                                         23.28, 25.70],
       ["I'm currently living in Da Nang.",                                              25.70, 28.32],
       ["I'm a student. I love learning languages.",                                     28.32, 31.92],
       ["The club owner nodded.",                                                        31.92, 33.48],
