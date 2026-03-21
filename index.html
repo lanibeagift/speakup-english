@@ -213,7 +213,7 @@ textarea::placeholder{color:var(--text3)}
       <div class="prog-lbl">Progress</div>
       <div class="prog-rail"><div class="prog-fill" id="prog-fill"></div></div>
     </div>
-    <div class="prog-num" id="prog-num">1 <small>/ 51</small></div>
+    <div class="prog-num" id="prog-num">1 <small>/ 44</small></div>
   </div>
 
   <!-- PRACTICE -->
@@ -355,8 +355,7 @@ audio.ontimeupdate = () => {
 // ── Play current sentence ──────────────────────────────
 function playCurrent() {
   if (!audioLoaded) {
-    document.getElementById('upload-btn').style.animation = 'none';
-    setTimeout(() => document.getElementById('upload-btn').style.animation = '', 100);
+    document.getElementById('p-sub').textContent = '⏳ Audio đang tải, vui lòng chờ…';
     return;
   }
 
