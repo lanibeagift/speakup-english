@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LovingLanguages — Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0c0a;--card:#1e1a15;--card2:#242018;
+  --border:#2e2820;--border2:#3a3228;
+  --gold:#d4a843;--gold2:#f0c96a;--gold-dim:#8a6e2a;
+  --gold-bg:rgba(212,168,67,0.08);--gold-bg2:rgba(212,168,67,0.18);
+  --text:#f0ead8;--text2:#9a9080;--text3:#6a6058;
+  --green:#4caf7d;--green-bg:rgba(76,175,125,0.12);--green-bd:rgba(76,175,125,0.3);
+  --red:#e05252;--red-bg:rgba(224,82,82,0.12);--red-bd:rgba(224,82,82,0.3);
+  --yellow:#e8b84b;--yellow-bg:rgba(232,184,75,0.12);--yellow-bd:rgba(232,184,75,0.3);
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+nav{background:rgba(14,12,10,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0.75rem 1.5rem;display:flex;align-items:center;gap:0.8rem;position:sticky;top:0;z-index:50}
+.btn-back{background:none;border:1px solid var(--border2);border-radius:7px;padding:0.28rem 0.7rem;font-family:'Outfit',sans-serif;font-size:0.78rem;color:var(--text3);cursor:pointer;transition:all 0.2s}
+.btn-back:hover{border-color:var(--gold-dim);color:var(--text)}
+.nav-center{flex:1;overflow:hidden}
+.nav-title{font-family:'Fraunces',serif;font-size:0.95rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-sub{font-size:0.7rem;color:var(--text3)}
+.mode-pill{font-size:0.72rem;padding:0.25rem 0.7rem;border-radius:20px;font-weight:600;white-space:nowrap}
+.mode-pill.dictation{background:var(--gold-bg2);color:var(--gold2)}
+.mode-pill.shadowing{background:var(--green-bg);color:#86efac}
+
+main{max-width:720px;margin:0 auto;padding:1.3rem 1.3rem 4rem}
+
+/* PLAYER */
+.player{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1rem}
+.player-top{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.8rem}
+.p-icon{font-size:1.5rem;flex-shrink:0}
+.p-title{font-family:'Fraunces',serif;font-size:0.9rem;font-weight:700}
+.p-sub{font-size:0.7rem;color:var(--text3);margin-top:0.1rem}
+.wave{display:flex;align-items:center;gap:3px;height:20px;margin-bottom:0.8rem;opacity:0;transition:opacity 0.2s}
+.wave.on{opacity:1}
+.wave span{display:block;width:3px;border-radius:3px;background:var(--gold)}
+.wave.on span:nth-child(1){animation:bar 0.9s 0.00s infinite ease-in-out}
+.wave.on span:nth-child(2){animation:bar 0.9s 0.12s infinite ease-in-out}
+.wave.on span:nth-child(3){animation:bar 0.9s 0.24s infinite ease-in-out}
+.wave.on span:nth-child(4){animation:bar 0.9s 0.16s infinite ease-in-out}
+.wave.on span:nth-child(5){animation:bar 0.9s 0.06s infinite ease-in-out}
+.wave.on span:nth-child(6){animation:bar 0.9s 0.20s infinite ease-in-out}
+.wave.on span:nth-child(7){animation:bar 0.9s 0.08s infinite ease-in-out}
+@keyframes bar{0%,100%{height:3px}50%{height:16px}}
+.controls{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap}
+.c-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.3rem;padding:0.48rem 0.85rem;border-radius:8px;font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:500;cursor:pointer;border:none;transition:all 0.18s;white-space:nowrap}
+.c-play{background:var(--gold);color:#0e0c0a;font-weight:700;min-width:80px}
+.c-play:hover:not(:disabled){background:var(--gold2)}
+.c-play:disabled{opacity:0.4;cursor:not-allowed}
+.c-repeat{background:none;border:1.5px solid var(--border2);color:var(--text3)}
+.c-repeat.on{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
+.speed-row{display:flex;align-items:center;gap:0.3rem;margin-left:auto}
+.spd-lbl{font-size:0.68rem;color:var(--text3)}
+.spd{padding:0.25rem 0.45rem;border-radius:5px;font-size:0.68rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:none;color:var(--text3);font-family:'Outfit',sans-serif;transition:all 0.15s}
+.spd.on{background:var(--gold-bg);border-color:var(--gold-dim);color:var(--gold2)}
+
+/* PROGRESS */
+.prog{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:0.8rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
+.prog-track{flex:1}
+.prog-lbl{font-size:0.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:0.25rem}
+.prog-rail{height:5px;background:var(--border2);border-radius:5px;overflow:hidden}
+.prog-fill{height:100%;background:var(--gold);border-radius:5px;transition:width 0.5s cubic-bezier(.4,0,.2,1);width:0%}
+.prog-num{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--gold);line-height:1;white-space:nowrap}
+.prog-num small{font-size:0.8rem;color:var(--text3);font-family:'Outfit',sans-serif;font-weight:400}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;animation:fadeUp 0.25s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card-lbl{font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1.3px;color:var(--gold-dim);margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:0.4rem}
+
+/* HINT */
+.hint-box{background:var(--gold-bg);border:1px solid var(--border2);border-radius:9px;padding:0.45rem 0.8rem;font-size:0.8rem;color:var(--gold2);font-family:monospace;letter-spacing:1.5px;margin-bottom:0.7rem;display:none}
+
+/* TEXTAREA */
+textarea{width:100%;background:var(--card2);border:1.5px solid var(--border2);border-radius:11px;padding:0.8rem 0.9rem;font-family:'Outfit',sans-serif;font-size:0.96rem;line-height:1.65;color:var(--text);resize:none;outline:none;min-height:80px;transition:border-color 0.2s,box-shadow 0.2s}
+textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,67,0.1)}
+textarea::placeholder{color:var(--text3)}
+
+/* FEEDBACK */
+.fb{margin-top:0.8rem;padding:0.75rem 0.95rem;border-radius:11px;font-size:0.82rem;line-height:1.75;display:none;animation:fadeUp 0.2s ease}
+.fb.ok{background:var(--green-bg);border:1px solid var(--green-bd);color:#86efac}
+.fb.bad{background:var(--red-bg);border:1px solid var(--red-bd);color:#fca5a5}
+.fb-h{font-weight:600;margin-bottom:0.25rem;font-size:0.84rem}
+.w-ok{color:var(--green);font-weight:500}
+.w-err{color:var(--red);text-decoration:line-through;opacity:0.75}
+.w-miss{color:var(--yellow);font-style:italic}
+
+/* SHADOWING */
+.script-box{background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--gold);border-radius:0 11px 11px 0;padding:0.9rem 1.1rem;font-size:1.02rem;line-height:1.8;color:var(--text);margin-bottom:1.2rem;transition:filter 0.3s}
+.script-box.blurred{filter:blur(8px);user-select:none;cursor:pointer}
+.btn-toggle{background:none;border:1px solid var(--border2);border-radius:6px;padding:0.18rem 0.55rem;font-size:0.7rem;font-weight:500;color:var(--text3);cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.18s}
+.btn-toggle:hover{border-color:var(--gold-dim);color:var(--gold)}
+.mic-area{text-align:center}
+.mic-btn{width:62px;height:62px;border-radius:50%;background:var(--card2);border:2px solid var(--border2);color:white;font-size:1.5rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;margin-bottom:0.6rem}
+.mic-btn:hover:not(:disabled){border-color:var(--gold);background:var(--gold-bg2);transform:scale(1.06)}
+.mic-btn.on{background:var(--red-bg);border-color:var(--red);animation:pulse 1.5s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(224,82,82,0.5)}70%{box-shadow:0 0 0 14px rgba(224,82,82,0)}100%{box-shadow:0 0 0 0 rgba(224,82,82,0)}}
+.mic-status{font-size:0.74rem;color:var(--text3);margin-bottom:0.7rem}
+.mic-status.live{color:var(--red);font-weight:500}
+.transcript-box{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:0.65rem 0.85rem;min-height:44px;font-size:0.86rem;color:var(--text2);font-style:italic;text-align:left;line-height:1.6;display:none;margin-bottom:0.65rem}
+
+/* BUTTONS */
+.row{display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap}
+.btn{padding:0.6rem 0.9rem;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;border:none;transition:all 0.18s;display:inline-flex;align-items:center;justify-content:center;gap:0.3rem;white-space:nowrap}
+.btn-gold{background:var(--gold);color:#0e0c0a;font-weight:600}
+.btn-gold:hover{background:var(--gold2)}
+.btn-outline{background:none;border:1.5px solid var(--border2);color:var(--text2)}
+.btn-outline:hover{border-color:var(--gold-dim);color:var(--text)}
+.btn-green{background:var(--green);color:#0e0c0a;font-weight:600;display:none}
+.btn-green:hover{filter:brightness(1.1)}
+.f1{flex:1}
+
+/* COMPLETE */
+.complete{display:none;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:2.5rem 1.8rem;text-align:center}
+.c-emoji{font-size:3rem;margin-bottom:0.7rem;line-height:1}
+.complete h2{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:900;margin-bottom:0.3rem}
+.complete p{color:var(--text2);font-size:0.87rem;margin-bottom:1.2rem}
+.score-ring{width:96px;height:96px;border-radius:50%;border:3px solid var(--gold);background:var(--gold-bg);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1.5rem}
+.score-big{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:900;color:var(--gold);line-height:1}
+.score-lbl{font-size:0.6rem;color:var(--gold-dim);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+.saving-note{font-size:0.75rem;color:var(--green);margin-bottom:1rem}
+.c-btns{display:flex;gap:0.7rem;justify-content:center;flex-wrap:wrap}
+
+@media(max-width:500px){
+  nav{padding:0.65rem 1rem}main{padding:1rem 1rem 3rem}.card{padding:1.1rem}
+  .player{padding:0.9rem 1rem}.speed-row{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+
+<audio id="audio" preload="auto"></audio>
+
+<nav>
+  <button class="btn-back" onclick="goBack()">← Back</button>
+  <div class="nav-center">
+    <div class="nav-title" id="nav-title">Practice</div>
+    <div class="nav-sub" id="nav-sub"></div>
+  </div>
+  <div class="mode-pill" id="mode-pill">...</div>
+</nav>
+
+<main>
+  <div class="player">
+    <div class="player-top">
+      <div class="p-icon" id="p-icon">🔊</div>
+      <div>
+        <div class="p-title" id="p-title">...</div>
+        <div class="p-sub" id="p-sub">Loading...</div>
+      </div>
+    </div>
+    <div class="wave" id="wave">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="controls">
+      <button class="c-btn c-play" id="play-btn" onclick="playCurrent()" disabled>▶ Play</button>
+      <button class="c-btn c-repeat on" id="rep-btn" onclick="toggleRepeat()">🔁 Repeat</button>
+      <div class="speed-row">
+        <span class="spd-lbl">Speed:</span>
+        <button class="spd" onclick="setSpeed(0.75,this)">0.75×</button>
+        <button class="spd on" onclick="setSpeed(1.0,this)">1×</button>
+        <button class="spd" onclick="setSpeed(1.25,this)">1.25×</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="prog">
+    <div class="prog-track">
+      <div class="prog-lbl">Progress</div>
+      <div class="prog-rail"><div class="prog-fill" id="prog-fill"></div></div>
+    </div>
+    <div class="prog-num" id="prog-num">1 <small>/ ?</small></div>
+  </div>
+
+  <div class="card" id="practice">
+
+    <!-- DICTATION -->
+    <div id="d-panel">
+      <div class="card-lbl">✍️ Listen &amp; type what you hear</div>
+      <div class="hint-box" id="hint-box"></div>
+      <textarea id="t-in" placeholder="Press ▶ Play to hear the sentence, then type it here…" rows="3"></textarea>
+      <div class="fb" id="d-fb"><div class="fb-h" id="d-fb-h"></div><div id="d-fb-b"></div></div>
+      <div class="row">
+        <button class="btn btn-outline" id="hint-btn" onclick="doHint()">💡 Hint</button>
+        <button class="btn btn-gold f1" id="chk-btn" onclick="doCheck()">Check ✓</button>
+        <button class="btn btn-green f1" id="nxt-btn" onclick="doNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- SHADOWING -->
+    <div id="s-panel" style="display:none">
+      <div class="card-lbl">
+        <span>🎤 Listen, then shadow the speaker</span>
+        <button class="btn-toggle" id="toggle-btn" onclick="toggleScript()">👁 Hide script</button>
+      </div>
+      <div class="script-box" id="s-script"></div>
+      <div class="mic-area">
+        <div><button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤</button></div>
+        <div class="mic-status" id="mic-st">Press ▶ to hear, then tap mic to repeat</div>
+        <div class="transcript-box" id="transcript-box"></div>
+        <div class="fb" id="s-fb"><div class="fb-h" id="s-fb-h"></div></div>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:1rem">
+        <button class="btn btn-gold f1" onclick="doNext()">Next sentence →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="complete" id="complete">
+    <div class="c-emoji" id="c-em">🎉</div>
+    <h2 id="c-ti">Lesson Complete!</h2>
+    <p id="c-ms">Great work!</p>
+    <div class="score-ring"><div class="score-big" id="c-sc">--</div><div class="score-lbl">accuracy</div></div>
+    <!-- Pass/fail message -->
+    <div id="pass-msg" style="display:none;margin-bottom:0.8rem;padding:0.7rem 1rem;border-radius:10px;font-size:0.82rem;font-weight:500;background:var(--green-bg);border:1px solid var(--green-bd);color:#86efac">
+      🎯 You passed! Next topic is now unlocked.
+    </div>
+    <div id="fail-msg" style="display:none;margin-bottom:0.8rem;padding:0.7rem 1rem;border-radius:10px;font-size:0.82rem;background:var(--red-bg);border:1px solid var(--red-bd);color:#fca5a5">
+      ❌ You need at least 80% to unlock the next topic. Try again!
+    </div>
+    <div class="saving-note" id="saving-note" style="display:none">✅ Progress saved!</div>
+    <div class="c-btns">
+      <button class="btn btn-outline" onclick="restart()">🔁 Try Again</button>
+      <button class="btn btn-gold" onclick="goBack()">📊 Dashboard</button>
+    </div>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="lessons.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyD4F3w5bZWqixn_d2R1TjrucRLcAi0GAfA",
+  authDomain: "speakup-english-91ca9.firebaseapp.com",
+  projectId: "speakup-english-91ca9",
+  storageBucket: "speakup-english-91ca9.firebasestorage.app",
+  messagingSenderId: "592364060883",
+  appId: "1:592364060883:web:339f07691f763681c9d426"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ── State ──────────────────────────────────────────────
+const topicId = parseInt(sessionStorage.getItem('ll_topic') || '4');
+const mode = sessionStorage.getItem('ll_mode') || 'dictation';
+const lesson = LESSONS_DATA[topicId];
+const SENTENCES = lesson?.sentences || [];
+
+let currentUser = null;
+let idx = 0, correct = 0, wrong = 0, hintLevel = 0, answered = false;
+let audioSpeed = 1.0, autoRepeat = true, isPlaying = false, stopTimer = null, audioLoaded = false;
+let scriptVisible = true, recog = null, isRec = false;
+let sessionStart = Date.now();
+
+const audio = document.getElementById('audio');
+
+// ── Auth ───────────────────────────────────────────────
+auth.onAuthStateChanged(user => {
+  if (!user) { window.location.href = 'index.html'; return; }
+  if (!lesson) { window.location.href = 'dashboard.html'; return; }
+  currentUser = user;
+
+  // Set audio src
+  audio.src = lesson.audio;
+  audio.oncanplay = () => {
+    audioLoaded = true;
+    document.getElementById('play-btn').disabled = false;
+    document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
+  };
+  audio.onerror = () => {
+    document.getElementById('p-sub').textContent = '⚠️ Audio file not found';
+  };
+
+  // Init UI
+  document.getElementById('nav-title').textContent = lesson.title;
+  document.getElementById('p-icon').textContent = lesson.emoji;
+  document.getElementById('p-title').textContent = lesson.title;
+  document.getElementById('p-sub').textContent = 'Loading audio…';
+  const pill = document.getElementById('mode-pill');
+  pill.textContent = mode === 'dictation' ? '✍️ Dictation' : '🎤 Shadowing';
+  pill.className = 'mode-pill ' + mode;
+  document.getElementById('prog-num').innerHTML = `1 <small>/ ${SENTENCES.length}</small>`;
+
+  render();
+});
+
+// ── Audio ──────────────────────────────────────────────
+function playCurrent() {
+  if (!audioLoaded) { document.getElementById('p-sub').textContent = '⏳ Loading audio…'; return; }
+  if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
+  const [, start, end] = SENTENCES[idx];
+  const duration = (end - start) / audioSpeed;
+  audio.playbackRate = audioSpeed;
+  audio.currentTime = start;
+  audio.play();
+  isPlaying = true;
+  document.getElementById('wave').classList.add('on');
+  document.getElementById('play-btn').textContent = '◼ Stop';
+  document.getElementById('play-btn').onclick = stopAudio;
+  document.getElementById('p-sub').textContent = `🔊 Playing sentence ${idx + 1}…`;
+  stopTimer = setTimeout(() => {
+    stopAudio();
+    if (autoRepeat) stopTimer = setTimeout(playCurrent, 700);
+  }, duration * 1000 + 100);
+}
+
+function stopAudio() {
+  if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
+  audio.pause();
+  isPlaying = false;
+  document.getElementById('wave').classList.remove('on');
+  document.getElementById('play-btn').textContent = '▶ Play';
+  document.getElementById('play-btn').onclick = playCurrent;
+  document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
+}
+
+function toggleRepeat() {
+  autoRepeat = !autoRepeat;
+  document.getElementById('rep-btn').classList.toggle('on', autoRepeat);
+}
+
+function setSpeed(s, el) {
+  audioSpeed = s;
+  document.querySelectorAll('.spd').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  if (isPlaying) { stopAudio(); setTimeout(playCurrent, 200); }
+}
+
+// ── Render ─────────────────────────────────────────────
+function render() {
+  if (idx >= SENTENCES.length) { showComplete(); return; }
+  stopAudio();
+  const pct = Math.round(idx / SENTENCES.length * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-num').innerHTML = `${idx+1} <small>/ ${SENTENCES.length}</small>`;
+  document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
+  answered = false; hintLevel = 0;
+  const card = document.getElementById('practice');
+  card.style.animation = 'none'; requestAnimationFrame(() => card.style.animation = '');
+
+  if (mode === 'dictation') {
+    document.getElementById('d-panel').style.display = 'block';
+    document.getElementById('s-panel').style.display = 'none';
+    document.getElementById('hint-box').style.display = 'none';
+    document.getElementById('hint-box').textContent = '';
+    document.getElementById('t-in').value = '';
+    document.getElementById('d-fb').style.display = 'none';
+    document.getElementById('nxt-btn').style.display = 'none';
+    document.getElementById('chk-btn').style.display = 'flex';
+    document.getElementById('hint-btn').disabled = false;
+    setTimeout(() => document.getElementById('t-in').focus(), 60);
+  } else {
+    document.getElementById('d-panel').style.display = 'none';
+    document.getElementById('s-panel').style.display = 'block';
+    document.getElementById('s-script').textContent = SENTENCES[idx][0];
+    document.getElementById('s-script').classList.toggle('blurred', !scriptVisible);
+    document.getElementById('transcript-box').style.display = 'none';
+    document.getElementById('s-fb').style.display = 'none';
+    document.getElementById('mic-st').textContent = 'Press ▶ to hear, then tap mic to repeat';
+    document.getElementById('mic-st').className = 'mic-status';
+    document.getElementById('mic-btn').className = 'mic-btn';
+    document.getElementById('mic-btn').textContent = '🎤';
+    if (isRec) stopRec();
+  }
+}
+
+// ── Dictation ──────────────────────────────────────────
+function norm(s) { return s.toLowerCase().replace(/[.,!?;:'"—–\-]/g,'').replace(/\s+/g,' ').trim(); }
+
+function doHint() {
+  hintLevel = Math.min(hintLevel+1, 2);
+  const words = SENTENCES[idx][0].split(' ');
+  const h = hintLevel===1 ? words.length+' words' : words.map(w=>w[0]+'_'.repeat(Math.max(w.length-1,1))).join('  ');
+  const el = document.getElementById('hint-box');
+  el.textContent = '💡 '+h; el.style.display = 'block';
+  if (hintLevel >= 2) document.getElementById('hint-btn').disabled = true;
+}
+
+function doCheck() {
+  const val = document.getElementById('t-in').value.trim();
+  if (!val) { document.getElementById('t-in').focus(); return; }
+  stopAudio();
+  const target = SENTENCES[idx][0];
+  const iw = norm(val).split(' '), tw = norm(target).split(' ');
+  const perfect = norm(val) === norm(target);
+  const fb = document.getElementById('d-fb');
+  const head = document.getElementById('d-fb-h');
+  const body = document.getElementById('d-fb-b');
+  fb.style.display = 'block';
+
+  if (perfect) {
+    fb.className = 'fb ok'; head.textContent = '✅ Perfect! Well done!'; body.innerHTML = ''; correct++;
+  } else {
+    fb.className = 'fb bad'; head.textContent = '❌ Not quite — see corrections:';
+    let h=''; const max=Math.max(iw.length,tw.length);
+    for(let i=0;i<max;i++){
+      const a=iw[i],b=tw[i];
+      if(!a) h+=`<span class="w-miss">[ ? ] </span>`;
+      else if(a===b) h+=`<span class="w-ok">${a} </span>`;
+      else h+=`<span class="w-err">${a} </span>`;
+    }
+    body.innerHTML = h;
+    wrong++;
+  }
+  answered = true;
+  document.getElementById('chk-btn').style.display = 'none';
+  document.getElementById('nxt-btn').style.display = 'flex';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('t-in').addEventListener('keydown', e => {
+    if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); answered?doNext():doCheck(); }
+  });
+});
+
+// ── Shadowing ──────────────────────────────────────────
+let scriptVisibleState = true;
+function toggleScript() {
+  scriptVisibleState = !scriptVisibleState;
+  document.getElementById('s-script').classList.toggle('blurred', !scriptVisibleState);
+  document.getElementById('toggle-btn').textContent = scriptVisibleState ? '👁 Hide script' : '👁 Show script';
+}
+
+function toggleMic() {
+  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  if (!SR) { alert('Speech recognition requires Google Chrome.'); return; }
+  isRec ? stopRec() : startRec();
+}
+
+function startRec() {
+  stopAudio();
+  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  recog = new SR(); recog.lang='en-US'; recog.interimResults=true;
+  isRec = true;
+  document.getElementById('mic-btn').className='mic-btn on';
+  document.getElementById('mic-btn').textContent='⏹';
+  document.getElementById('mic-st').textContent='🔴 Recording… speak now';
+  document.getElementById('mic-st').className='mic-status live';
+  const tb=document.getElementById('transcript-box');
+  tb.style.display='block'; tb.textContent='…listening…';
+  let finalText='';
+  recog.onresult=e=>{
+    let interim=''; finalText='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) finalText+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    tb.textContent=finalText||interim||'…';
+  };
+  recog.onend=()=>{
+    isRec=false;
+    document.getElementById('mic-btn').className='mic-btn';
+    document.getElementById('mic-btn').textContent='🎤';
+    document.getElementById('mic-st').textContent='Done. Tap mic to record again.';
+    document.getElementById('mic-st').className='mic-status';
+    if(finalText) analyzeShad(finalText);
+  };
+  recog.onerror=e=>{
+    isRec=false;
+    document.getElementById('mic-btn').className='mic-btn';
+    document.getElementById('mic-btn').textContent='🎤';
+    const msgs={'no-speech':'No speech detected.','not-allowed':'Mic access denied.','network':'Network error.'};
+    document.getElementById('mic-st').textContent=msgs[e.error]||'Error: '+e.error;
+    document.getElementById('mic-st').className='mic-status';
+  };
+  recog.start();
+}
+function stopRec() { if(recog) recog.stop(); isRec=false; }
+
+function analyzeShad(transcript) {
+  const tw=norm(SENTENCES[idx][0]).split(' ');
+  const rw=norm(transcript).split(' ');
+  const hits=rw.filter(w=>tw.includes(w)).length;
+  const pct=Math.min(100,Math.round(hits/tw.length*100));
+  const fb=document.getElementById('s-fb');
+  const head=document.getElementById('s-fb-h');
+  fb.style.display='block';
+  if(pct>=80){fb.className='fb ok';head.textContent=`✅ Excellent! ${pct}% match`;correct++;}
+  else if(pct>=50){fb.className='fb bad';head.textContent=`🟡 ${pct}% — listen again and try once more.`;}
+  else{fb.className='fb bad';head.textContent=`🔁 ${pct}% — slow down and focus on each word.`;}
+}
+
+// ── Navigation ─────────────────────────────────────────
+function doNext() { idx++; render(); }
+function goBack() { stopAudio(); window.location.href='dashboard.html'; }
+
+// ── Complete + Save to Firebase ────────────────────────
+async function showComplete() {
+  stopAudio();
+  const duration = Math.floor((Date.now() - sessionStart) / 1000);
+  const accuracy = Math.round(correct / SENTENCES.length * 100);
+  const passed = accuracy >= 80;
+  const today = new Date().toISOString().split('T')[0];
+
+  document.getElementById('practice').style.display='none';
+  document.getElementById('complete').style.display='block';
+  document.getElementById('prog-fill').style.width='100%';
+  document.getElementById('prog-num').innerHTML=`${SENTENCES.length} <small>/ ${SENTENCES.length}</small>`;
+  document.getElementById('c-sc').textContent=accuracy+'%';
+
+  // Pass / fail message
+  document.getElementById('pass-msg').style.display = passed ? 'block' : 'none';
+  document.getElementById('fail-msg').style.display = passed ? 'none' : 'block';
+
+  let e,t,m;
+  if (passed) {
+    if (accuracy>=90){e='🏆';t='Outstanding!';m='Near-perfect — you absolutely nailed it!'}
+    else {e='🎉';t='Lesson Passed!';m=`${accuracy}% accuracy — next topic is now unlocked!`}
+  } else {
+    if (accuracy>=60){e='😅';t='Almost there!';m=`${accuracy}% — you need 80% to pass. Keep going!`}
+    else {e='💪';t='Keep practicing!';m=`${accuracy}% — listen carefully and try again!`}
+  }
+  document.getElementById('c-em').textContent=e;
+  document.getElementById('c-ti').textContent=t;
+  document.getElementById('c-ms').textContent=m;
+
+  // Save to Firestore only if passed
+  if (currentUser) {
+    try {
+      const userRef = db.collection('users').doc(currentUser.uid);
+      const doc = await userRef.get();
+      const data = doc.exists ? doc.data() : {};
+
+      // Streak logic
+      let streak = data.streak || 0;
+      let longestStreak = data.longestStreak || 0;
+      const lastDate = data.lastStudyDate;
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      if (lastDate === today) { /* already studied today */ }
+      else if (lastDate === yesterdayStr) { streak += 1; }
+      else { streak = 1; }
+      longestStreak = Math.max(longestStreak, streak);
+
+      let studyDates = data.studyDates || [];
+      if (!studyDates.includes(today)) studyDates.push(today);
+      studyDates = studyDates.slice(-30);
+
+      // Build update object — always save session stats
+      const updateData = {
+        streak, longestStreak, lastStudyDate: today, studyDates,
+        totalSessions: firebase.firestore.FieldValue.increment(1),
+        totalCorrect: firebase.firestore.FieldValue.increment(correct),
+        totalWrong: firebase.firestore.FieldValue.increment(wrong),
+        totalSeconds: firebase.firestore.FieldValue.increment(duration),
+        [`progress.${topicId}_${mode}`]: accuracy,
+      };
+
+      // Only unlock next topic if passed (accuracy >= 80%)
+      if (passed) {
+        const nextTopicId = topicId + 1;
+        const allTopicIds = Object.keys(LESSONS_DATA).map(Number);
+        if (allTopicIds.includes(nextTopicId)) {
+          // Mark current topic as passed
+          updateData[`unlocked.topic${topicId}`] = true;
+        }
+      }
+
+      await userRef.update(updateData);
+
+      // Add session record
+      await userRef.collection('sessions').add({
+        topicId, mode,
+        date: new Date().toISOString(),
+        duration, correct, wrong,
+        total: SENTENCES.length,
+        accuracy, passed,
+      });
+
+      document.getElementById('saving-note').style.display='block';
+    } catch(err) {
+      console.error('Save error:', err);
+    }
+  }
+}
+
+function restart() {
+  idx=0; correct=0; wrong=0; hintLevel=0; answered=false;
+  sessionStart = Date.now();
+  document.getElementById('practice').style.display='block';
+  document.getElementById('complete').style.display='none';
+  document.getElementById('saving-note').style.display='none';
+  render();
+}
+</script>
+</body>
+</html>
