@@ -3,622 +3,160 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SpeakUp — Inviting a Guest Home</title>
+<title>LovingLanguages — Learn English</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0e0c0a;--card:#1e1a15;--card2:#242018;
   --border:#2e2820;--border2:#3a3228;
   --gold:#d4a843;--gold2:#f0c96a;--gold-dim:#8a6e2a;
-  --gold-bg:rgba(212,168,67,0.08);--gold-bg2:rgba(212,168,67,0.18);
+  --gold-bg:rgba(212,168,67,0.08);
   --text:#f0ead8;--text2:#9a9080;--text3:#6a6058;
-  --green:#4caf7d;--green-bg:rgba(76,175,125,0.12);--green-bd:rgba(76,175,125,0.3);
-  --red:#e05252;--red-bg:rgba(224,82,82,0.12);--red-bd:rgba(224,82,82,0.3);
-  --yellow:#e8b84b;--yellow-bg:rgba(232,184,75,0.12);--yellow-bd:rgba(232,184,75,0.3);
+  --green:#4caf7d;--red:#e05252;
 }
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;position:relative;overflow:hidden}
+body::before{content:'';position:fixed;top:-20%;right:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(212,168,67,0.06) 0%,transparent 70%);pointer-events:none}
+body::after{content:'';position:fixed;bottom:-20%;left:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(212,168,67,0.04) 0%,transparent 70%);pointer-events:none}
 
-/* HEADER */
-header{border-bottom:1px solid var(--border);padding:0.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;background:rgba(14,12,10,0.95);backdrop-filter:blur(16px)}
-.logo{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:900}
-.logo em{color:var(--gold);font-style:italic}
-.header-right{display:flex;align-items:center;gap:0.6rem}
-.topic-chip{font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--gold-dim);border:1px solid var(--border2);border-radius:20px;padding:0.2rem 0.65rem}
-.mode-tabs{display:flex;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:3px}
-.tab{padding:0.36rem 0.9rem;border-radius:7px;font-size:0.78rem;font-weight:500;cursor:pointer;color:var(--text2);border:none;background:none;font-family:'Outfit',sans-serif;transition:all 0.2s;white-space:nowrap}
-.tab.active{background:var(--gold);color:#0e0c0a;font-weight:600}
-.tab:not(.active):hover{color:var(--text)}
+.page{width:100%;max-width:400px;position:relative;z-index:1;animation:fadeUp 0.5s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-/* MAIN */
-main{max-width:720px;margin:0 auto;padding:1.3rem 1.3rem 4rem}
+.brand{text-align:center;margin-bottom:2rem}
+.brand-logo{width:56px;height:56px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 1rem}
+.brand h1{font-family:'Fraunces',serif;font-size:2rem;font-weight:900;letter-spacing:-1px;color:var(--text)}
+.brand h1 em{color:var(--gold);font-style:italic}
+.brand p{font-size:0.85rem;color:var(--text3);margin-top:0.4rem}
 
-/* ── AUDIO PLAYER ── */
-.player{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.3rem;margin-bottom:1rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem}
 
-.player-top{display:flex;align-items:center;gap:0.85rem;margin-bottom:1rem}
-.p-icon{font-size:1.5rem;flex-shrink:0;line-height:1}
-.p-title{font-family:'Fraunces',serif;font-size:0.92rem;font-weight:700}
-.p-sub{font-size:0.7rem;color:var(--text3);margin-top:0.1rem}
+.card h2{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;margin-bottom:0.3rem}
+.card p{font-size:0.82rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.5}
 
-/* Audio setup notice */
-.audio-notice{
-  background:var(--gold-bg);border:1px solid var(--border2);border-radius:10px;
-  padding:0.7rem 0.9rem;font-size:0.78rem;color:var(--gold2);
-  margin-bottom:0.9rem;line-height:1.6;display:none;
-}
-.audio-notice a{color:var(--gold);text-decoration:underline;cursor:pointer}
+.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:0.8rem;padding:0.85rem 1rem;border:1.5px solid var(--border2);border-radius:12px;background:var(--card2);font-family:'Outfit',sans-serif;font-size:0.92rem;font-weight:500;color:var(--text);cursor:pointer;transition:all 0.2s}
+.btn-google:hover{border-color:var(--gold-dim);background:var(--gold-bg)}
+.btn-google:disabled{opacity:0.5;cursor:not-allowed}
+.google-svg{width:18px;height:18px;flex-shrink:0}
 
-/* Waveform */
-.wave{display:flex;align-items:center;gap:3px;height:22px;margin-bottom:0.9rem;opacity:0;transition:opacity 0.2s}
-.wave.on{opacity:1}
-.wave span{display:block;width:3px;border-radius:3px;background:var(--gold)}
-.wave.on span:nth-child(1){animation:bar 0.9s 0.00s infinite ease-in-out}
-.wave.on span:nth-child(2){animation:bar 0.9s 0.12s infinite ease-in-out}
-.wave.on span:nth-child(3){animation:bar 0.9s 0.24s infinite ease-in-out}
-.wave.on span:nth-child(4){animation:bar 0.9s 0.16s infinite ease-in-out}
-.wave.on span:nth-child(5){animation:bar 0.9s 0.06s infinite ease-in-out}
-.wave.on span:nth-child(6){animation:bar 0.9s 0.20s infinite ease-in-out}
-.wave.on span:nth-child(7){animation:bar 0.9s 0.08s infinite ease-in-out}
-@keyframes bar{0%,100%{height:3px}50%{height:18px}}
+.divider{display:flex;align-items:center;gap:0.8rem;margin:1.2rem 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider span{font-size:0.72rem;color:var(--text3)}
 
-/* Controls row */
-.controls{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap}
-.c-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.5rem 0.9rem;border-radius:9px;font-family:'Outfit',sans-serif;font-size:0.79rem;font-weight:500;cursor:pointer;border:none;transition:all 0.18s;white-space:nowrap}
-.c-play{background:var(--gold);color:#0e0c0a;font-weight:700;min-width:88px}
-.c-play:hover:not(:disabled){background:var(--gold2)}
-.c-play:disabled{opacity:0.4;cursor:not-allowed}
-.c-repeat{background:none;border:1.5px solid var(--border2);color:var(--text3)}
-.c-repeat:hover{border-color:var(--gold-dim);color:var(--text)}
-.c-repeat.on{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
-.speed-row{display:flex;align-items:center;gap:0.35rem;margin-left:auto}
-.spd-lbl{font-size:0.7rem;color:var(--text3)}
-.spd{padding:0.28rem 0.5rem;border-radius:6px;font-size:0.7rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:none;color:var(--text3);font-family:'Outfit',sans-serif;transition:all 0.15s}
-.spd.on{background:var(--gold-bg);border-color:var(--gold-dim);color:var(--gold2)}
+.features{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:1.2rem}
+.feat{display:flex;align-items:center;gap:0.4rem;font-size:0.78rem;color:var(--text3)}
+.feat-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0}
 
-/* Upload audio button */
-.upload-row{display:flex;align-items:center;gap:0.7rem;margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--border)}
-.upload-lbl{font-size:0.72rem;color:var(--text3);flex:1;line-height:1.5}
-.upload-lbl strong{color:var(--text2)}
-.btn-upload{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 0.85rem;background:none;border:1.5px solid var(--border2);border-radius:9px;font-family:'Outfit',sans-serif;font-size:0.78rem;color:var(--text2);cursor:pointer;transition:all 0.18s;white-space:nowrap}
-.btn-upload:hover{border-color:var(--gold-dim);color:var(--text)}
-.btn-upload.loaded{border-color:var(--green);color:var(--green)}
-#file-input{display:none}
+.status{text-align:center;font-size:0.8rem;color:var(--text2);margin-top:0.8rem;min-height:1.2rem}
+.status.error{color:var(--red)}
 
-/* PROGRESS */
-.prog{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:0.85rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
-.prog-track{flex:1}
-.prog-lbl{font-size:0.67rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:0.28rem}
-.prog-rail{height:5px;background:var(--border2);border-radius:5px;overflow:hidden}
-.prog-fill{height:100%;background:var(--gold);border-radius:5px;transition:width 0.5s cubic-bezier(.4,0,.2,1);width:0%}
-.prog-num{font-family:'Fraunces',serif;font-size:1.65rem;font-weight:700;color:var(--gold);line-height:1;white-space:nowrap}
-.prog-num small{font-size:0.82rem;color:var(--text3);font-family:'Outfit',sans-serif;font-weight:400}
-
-/* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;animation:fadeUp 0.25s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.card-lbl{font-size:0.67rem;font-weight:600;text-transform:uppercase;letter-spacing:1.3px;color:var(--gold-dim);margin-bottom:1rem;display:flex;align-items:center;gap:0.4rem}
-
-/* HINT */
-.hint-box{background:var(--gold-bg);border:1px solid var(--border2);border-radius:9px;padding:0.5rem 0.85rem;font-size:0.82rem;color:var(--gold2);font-family:monospace;letter-spacing:1.5px;margin-bottom:0.75rem;display:none}
-
-/* TEXTAREA */
-textarea{width:100%;background:var(--card2);border:1.5px solid var(--border2);border-radius:11px;padding:0.82rem 0.95rem;font-family:'Outfit',sans-serif;font-size:0.97rem;line-height:1.65;color:var(--text);resize:none;outline:none;min-height:82px;transition:border-color 0.2s,box-shadow 0.2s}
-textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,67,0.1)}
-textarea::placeholder{color:var(--text3)}
-
-/* FEEDBACK */
-.fb{margin-top:0.85rem;padding:0.8rem 1rem;border-radius:11px;font-size:0.83rem;line-height:1.75;display:none;animation:fadeUp 0.2s ease}
-.fb.ok{background:var(--green-bg);border:1px solid var(--green-bd);color:#86efac}
-.fb.bad{background:var(--red-bg);border:1px solid var(--red-bd);color:#fca5a5}
-.fb-h{font-weight:600;margin-bottom:0.3rem;font-size:0.86rem}
-.w-ok{color:var(--green);font-weight:500}
-.w-err{color:var(--red);text-decoration:line-through;opacity:0.75}
-.w-miss{color:var(--yellow);font-style:italic}
-
-/* SHADOWING */
-.script-box{background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--gold);border-radius:0 11px 11px 0;padding:0.95rem 1.1rem;font-size:1.03rem;line-height:1.8;color:var(--text);margin-bottom:1.2rem;transition:filter 0.3s}
-.script-box.blurred{filter:blur(8px);user-select:none;cursor:pointer}
-.btn-toggle-script{background:none;border:1px solid var(--border2);border-radius:7px;padding:0.2rem 0.6rem;font-size:0.72rem;font-weight:500;color:var(--text3);cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.18s;white-space:nowrap}
-.btn-toggle-script:hover{border-color:var(--gold-dim);color:var(--gold)}
-.mic-area{text-align:center}
-.mic-btn{width:64px;height:64px;border-radius:50%;background:var(--card2);border:2px solid var(--border2);color:white;font-size:1.5rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;margin-bottom:0.6rem}
-.mic-btn:hover:not(:disabled){border-color:var(--gold);background:var(--gold-bg2);transform:scale(1.06)}
-.mic-btn.on{background:var(--red-bg);border-color:var(--red);animation:pulse 1.5s infinite}
-.mic-btn:disabled{opacity:0.35;cursor:not-allowed}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(224,82,82,0.5)}70%{box-shadow:0 0 0 14px rgba(224,82,82,0)}100%{box-shadow:0 0 0 0 rgba(224,82,82,0)}}
-.mic-status{font-size:0.76rem;color:var(--text3);margin-bottom:0.75rem}
-.mic-status.live{color:var(--red);font-weight:500}
-.transcript-box{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:0.7rem 0.9rem;min-height:46px;font-size:0.88rem;color:var(--text2);font-style:italic;text-align:left;line-height:1.6;display:none;margin-bottom:0.7rem}
-
-/* BUTTONS */
-.row{display:flex;gap:0.5rem;margin-top:0.85rem;flex-wrap:wrap}
-.btn{padding:0.62rem 0.95rem;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;border:none;transition:all 0.18s;display:inline-flex;align-items:center;justify-content:center;gap:0.3rem;white-space:nowrap}
-.btn-gold{background:var(--gold);color:#0e0c0a;font-weight:600}
-.btn-gold:hover{background:var(--gold2)}
-.btn-outline{background:none;border:1.5px solid var(--border2);color:var(--text2)}
-.btn-outline:hover{border-color:var(--gold-dim);color:var(--text)}
-.btn-green{background:var(--green);color:#0e0c0a;font-weight:600;display:none}
-.btn-green:hover{filter:brightness(1.1)}
-.f1{flex:1}
-
-/* COMPLETE */
-.complete{display:none;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:2.5rem 1.8rem;text-align:center}
-.c-emoji{font-size:3.2rem;margin-bottom:0.7rem;line-height:1}
-.complete h2{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:900;margin-bottom:0.3rem}
-.complete p{color:var(--text2);font-size:0.88rem;margin-bottom:1.3rem}
-.score-ring{width:100px;height:100px;border-radius:50%;border:3px solid var(--gold);background:var(--gold-bg);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1.8rem}
-.score-big{font-family:'Fraunces',serif;font-size:1.9rem;font-weight:900;color:var(--gold);line-height:1}
-.score-lbl{font-size:0.62rem;color:var(--gold-dim);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
-.c-btns{display:flex;gap:0.7rem;justify-content:center;flex-wrap:wrap}
-
-@media(max-width:500px){
-  header{padding:0.7rem 1rem}main{padding:1rem 1rem 3rem}.card{padding:1.1rem}
-  .player{padding:0.9rem 1rem}.topic-chip{display:none}.speed-row{margin-left:0;width:100%}
-}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="logo">Speak<em>Up</em></div>
-  <div class="header-right">
-    <div class="topic-chip">Topic 4</div>
-    <div class="mode-tabs">
-      <button class="tab active" id="tab-d" onclick="setMode('dictation',this)">✍️ Dictation</button>
-      <button class="tab" id="tab-s" onclick="setMode('shadowing',this)">🎤 Shadowing</button>
-    </div>
-  </div>
-</header>
-
-<!-- Audio loads automatically from repo -->
-<audio id="audio" preload="auto" src="Topic4.mp3"></audio>
-
-<main>
-
-  <!-- PLAYER -->
-  <div class="player">
-    <div class="player-top">
-      <div class="p-icon">🔊</div>
-      <div>
-        <div class="p-title">Inviting a Guest Home</div>
-        <div class="p-sub" id="p-sub">Loading audio…</div>
-      </div>
-    </div>
-
-    <div class="wave" id="wave">
-      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-    </div>
-    <!-- DEBUG: show current time -->
-    <div id="debug-bar" style="font-size:0.72rem;color:var(--text3);margin-bottom:0.7rem;font-family:monospace;background:var(--card2);padding:0.4rem 0.7rem;border-radius:7px;">
-      ⏱ Audio time: <span id="debug-time">0.00</span>s &nbsp;|&nbsp; Sentence <span id="debug-sent">1</span>: <span id="debug-range">0.00 → 4.40</span>s
-    </div>
-
-    <div class="controls">
-      <button class="c-btn c-play" id="play-btn" onclick="playCurrent()" disabled>▶ Play</button>
-      <button class="c-btn c-repeat on" id="rep-btn" onclick="toggleRepeat()">🔁 Repeat</button>
-      <div class="speed-row">
-        <span class="spd-lbl">Speed:</span>
-        <button class="spd" onclick="setSpeed(0.75,this)">0.75×</button>
-        <button class="spd on" onclick="setSpeed(1.0,this)">1×</button>
-        <button class="spd" onclick="setSpeed(1.25,this)">1.25×</button>
-      </div>
-    </div>
+<div class="page">
+  <div class="brand">
+    <div class="brand-logo">🗣️</div>
+    <h1>Loving<em>Languages</em></h1>
+    <p>Dictation & Shadowing — Learn English the right way</p>
   </div>
 
-  <!-- PROGRESS -->
-  <div class="prog">
-    <div class="prog-track">
-      <div class="prog-lbl">Progress</div>
-      <div class="prog-rail"><div class="prog-fill" id="prog-fill"></div></div>
-    </div>
-    <div class="prog-num" id="prog-num">1 <small>/ 44</small></div>
-  </div>
+  <div class="card">
+    <h2>Welcome back 👋</h2>
+    <p>Sign in to track your streak, progress, and learning history.</p>
 
-  <!-- PRACTICE -->
-  <div class="card" id="practice">
+    <button class="btn-google" id="google-btn" onclick="signInGoogle()">
+      <svg class="google-svg" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Continue with Google
+    </button>
 
-    <!-- DICTATION -->
-    <div id="d-panel">
-      <div class="card-lbl">✍️ Listen &amp; type what you hear</div>
-      <div class="hint-box" id="hint-box"></div>
-      <textarea id="t-in" placeholder="Press ▶ Play to hear the sentence, then type it here…" rows="3"></textarea>
-      <div class="fb" id="d-fb"><div class="fb-h" id="d-fb-h"></div><div id="d-fb-b"></div></div>
-      <div class="row">
-        <button class="btn btn-outline" id="hint-btn" onclick="doHint()">💡 Hint</button>
-        <button class="btn btn-gold f1" id="chk-btn" onclick="doCheck()">Check ✓</button>
-        <button class="btn btn-green f1" id="nxt-btn" onclick="doNext()">Next →</button>
-      </div>
-    </div>
+    <div class="status" id="status"></div>
 
-    <!-- SHADOWING -->
-    <div id="s-panel" style="display:none">
-      <div class="card-lbl" style="justify-content:space-between">
-        <span>🎤 Listen, then shadow the speaker</span>
-        <button class="btn-toggle-script" id="toggle-script-btn" onclick="toggleScript()">👁 Hide script</button>
-      </div>
-      <div class="script-box" id="s-script"></div>
-      <div class="mic-area">
-        <div><button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤</button></div>
-        <div class="mic-status" id="mic-st">Press ▶ to hear, then tap mic to repeat</div>
-        <div class="transcript-box" id="transcript-box"></div>
-        <div class="fb" id="s-fb"><div class="fb-h" id="s-fb-h"></div></div>
-      </div>
-      <div class="row" style="justify-content:center;margin-top:1rem">
-        <button class="btn btn-gold f1" onclick="doNext()">Next sentence →</button>
-      </div>
-    </div>
+    <div class="divider"><span>what you get</span></div>
 
-  </div>
-
-  <!-- COMPLETE -->
-  <div class="complete" id="complete">
-    <div class="c-emoji" id="c-em">🎉</div>
-    <h2 id="c-ti">Lesson Complete!</h2>
-    <p id="c-ms">Great work finishing all the sentences!</p>
-    <div class="score-ring"><div class="score-big" id="c-sc">--</div><div class="score-lbl">accuracy</div></div>
-    <div class="c-btns">
-      <button class="btn btn-outline" onclick="restart()">🔁 Try Again</button>
-      <button class="btn btn-gold" onclick="switchMode()">🔄 Switch Mode</button>
+    <div class="features">
+      <div class="feat"><div class="feat-dot"></div>✍️ Dictation</div>
+      <div class="feat"><div class="feat-dot"></div>🎤 Shadowing</div>
+      <div class="feat"><div class="feat-dot"></div>🔥 Daily streak</div>
+      <div class="feat"><div class="feat-dot"></div>📊 Progress tracking</div>
+      <div class="feat"><div class="feat-dot"></div>📅 Study history</div>
+      <div class="feat"><div class="feat-dot"></div>🎯 4 topics</div>
     </div>
   </div>
+</div>
 
-</main>
-
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-// ── Script + Timestamps ────────────────────────────────
-// start = khi câu bắt đầu trong audio, end = khi câu kết thúc
-const SENTENCES = [
-  ["After the sharing time, the club owner smiled at me.",                               0.00,   4.40],
-  ["Rose, she said, your family sounds interesting.",                                    4.40,   9.24],
-  ["I felt a little shy, but I smiled.",                                                 9.24,  13.28],
-  ["Thank you!",                                                                        13.28,  14.62],
-  ["Then she asked, do you live near here?",                                            14.62,  18.82],
-  ["Yes, I said. My house is not very far from the club.",                              18.82,  24.40],
-  ["She laughed softly.",                                                               24.40,  26.42],
-  ["Really? I would love to see your home someday.",                                    26.42,  30.26],
-  ["I thought for a moment.",                                                           30.26,  32.56],
-  ["Then I said, why don't you visit my house this weekend?",                           32.56,  37.64],
-  ["Her eyes lit up.",                                                                  37.64,  40.00],
-  ["That sounds lovely!",                                                               40.00,  41.78],
-  ["On Saturday afternoon, she came to my house.",                                      41.78,  46.08],
-  ["When she arrived, I opened the door and waved.",                                    46.08,  50.02],
-  ["Welcome to my house!",                                                              50.02,  52.02],
-  ["She smiled and said, thank you for inviting me, Rose.",                             52.02,  56.88],
-  ["She looked at the building and said, oh, this house looks quite big.",              56.88,  63.14],
-  ["I nodded and explained, yes, my family lives here, but we also rent out some rooms.", 63.14, 71.14],
-  ["I began to introduce the house.",                                                   71.14,  74.28],
-  ["This is the first floor, I said. A small shop rents this space.",                   74.28,  80.60],
-  ["They sell clothes.",                                                                80.60,  82.28],
-  ["Then I continued. On the upper floors there are several rooms.",                    82.28,  89.82],
-  ["Some students rent rooms here and some small families live here too.",              89.82,  96.00],
-  ["Then I said, come, let me show you where my family lives.",                         96.00, 103.50],
-  ["We walked upstairs.",                                                              103.50, 106.00],
-  ["This is our living room, I explained.",                                            106.00, 110.44],
-  ["In the evening, my parents, my sister, and I often sit here and talk.",            110.44, 116.00],
-  ["Then I pointed to another room. This is our kitchen.",                             116.00, 121.00],
-  ["My mom cooks many delicious meals here.",                                          121.00, 127.66],
-  ["Over there is our bathroom. It's small, but we always keep it clean.",             127.66, 132.00],
-  ["And we have two bedrooms. They are small, but very cozy.",                         132.00, 136.00],
-  ["Near the window, there was a small table with some books.",                        136.00, 140.00],
-  ["This is my favorite place, I said. I like to sit here and read.",                  140.00, 144.74],
-  ["The club owner smiled warmly.",                                                    144.74, 148.00],
-  ["That sounds like a very peaceful moment.",                                         148.00, 153.16],
-  ["After the tour, we sat in the living room and drank some tea.",                    153.16, 158.50],
-  ["The club owner said, Rose, you introduced your house very clearly in English.",    158.50, 163.50],
-  ["I laughed a little.",                                                              163.50, 165.50],
-  ["I'm still learning, I said, but I like practicing English with real-life things.", 165.50, 168.74],
-  ["She nodded. That's the best way to learn.",                                        168.74, 177.40],
-  ["Then she said, next week at the club, maybe everyone can talk about their houses.", 177.40, 183.80],
-  ["My eyes lit up. That sounds fun!",                                                 183.80, 186.18],
-  ["And suddenly I realized something.",                                               186.18, 189.00],
-  ["Sometimes, the best English lesson is simply sharing your life, your home, and your stories with others.", 189.00, 195.54],
-];
-
-// ── State ──────────────────────────────────────────────
-let mode = 'dictation';
-let idx = 0;
-let correct = 0;
-let hintLevel = 0;
-let answered = false;
-let audioSpeed = 1.0;
-let autoRepeat = true;
-let isPlaying = false;
-let stopTimer = null;
-let audioLoaded = false;
-let recog = null;
-let isRec = false;
-
-const audio = document.getElementById('audio');
-document.getElementById('prog-num').innerHTML = `1 <small>/ ${SENTENCES.length}</small>`;
-
-// ── Auto-load Audio ────────────────────────────────────
-audio.oncanplay = () => {
-  audioLoaded = true;
-  document.getElementById('play-btn').disabled = false;
-  document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
+const firebaseConfig = {
+  apiKey: "AIzaSyD4F3w5bZWqixn_d2R1TjrucRLcAi0GAfA",
+  authDomain: "speakup-english-91ca9.firebaseapp.com",
+  projectId: "speakup-english-91ca9",
+  storageBucket: "speakup-english-91ca9.firebasestorage.app",
+  messagingSenderId: "592364060883",
+  appId: "1:592364060883:web:339f07691f763681c9d426"
 };
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-audio.onerror = () => {
-  document.getElementById('p-sub').textContent = '⚠️ Audio not found. Make sure Topic 4.wav is in the same folder.';
-};
-
-// Debug: update time display in real time
-audio.ontimeupdate = () => {
-  document.getElementById('debug-time').textContent = audio.currentTime.toFixed(2);
-  document.getElementById('debug-sent').textContent = idx + 1;
-  document.getElementById('debug-range').textContent =
-    SENTENCES[idx][1].toFixed(2) + ' → ' + SENTENCES[idx][2].toFixed(2);
-};
-
-// ── Play current sentence ──────────────────────────────
-function playCurrent() {
-  if (!audioLoaded) {
-    document.getElementById('p-sub').textContent = '⏳ Audio đang tải, vui lòng chờ…';
-    return;
-  }
-
-  // Stop any running timer
-  if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
-
-  const [text, start, end] = SENTENCES[idx];
-  const duration = (end - start) / audioSpeed;
-
-  audio.playbackRate = audioSpeed;
-  audio.currentTime = start;
-  audio.play();
-  isPlaying = true;
-
-  document.getElementById('wave').classList.add('on');
-  document.getElementById('play-btn').textContent = '◼ Stop';
-  document.getElementById('play-btn').onclick = stopAudio;
-  document.getElementById('p-sub').textContent = `🔊 Playing sentence ${idx + 1}…`;
-
-  // Stop at end time
-  stopTimer = setTimeout(() => {
-    stopAudio();
-    if (autoRepeat) {
-      stopTimer = setTimeout(playCurrent, 700);
-    }
-  }, duration * 1000 + 100);
-}
-
-function stopAudio() {
-  if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
-  audio.pause();
-  isPlaying = false;
-  document.getElementById('wave').classList.remove('on');
-  document.getElementById('play-btn').textContent = '▶ Play';
-  document.getElementById('play-btn').onclick = playCurrent;
-  document.getElementById('p-sub').textContent = `Sentence ${idx + 1} of ${SENTENCES.length} — press ▶ Play`;
-}
-
-function toggleRepeat() {
-  autoRepeat = !autoRepeat;
-  document.getElementById('rep-btn').classList.toggle('on', autoRepeat);
-}
-
-function setSpeed(s, el) {
-  audioSpeed = s;
-  document.querySelectorAll('.spd').forEach(b => b.classList.remove('on'));
-  el.classList.add('on');
-  if (isPlaying) { stopAudio(); setTimeout(playCurrent, 200); }
-}
-
-// ── Toggle script visibility ───────────────────────────
-let scriptVisible = true;
-function toggleScript() {
-  scriptVisible = !scriptVisible;
-  const box = document.getElementById('s-script');
-  const btn = document.getElementById('toggle-script-btn');
-  box.classList.toggle('blurred', !scriptVisible);
-  btn.textContent = scriptVisible ? '👁 Hide script' : '👁 Show script';
-}
-
-// ── Mode ───────────────────────────────────────────────
-function setMode(m, el) {
-  mode = m;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  restart();
-}
-function switchMode() {
-  const o = mode === 'dictation' ? 'shadowing' : 'dictation';
-  document.getElementById('tab-d').classList.toggle('active', o === 'dictation');
-  document.getElementById('tab-s').classList.toggle('active', o === 'shadowing');
-  mode = o; restart();
-}
-
-// ── Render ─────────────────────────────────────────────
-function render() {
-  if (idx >= SENTENCES.length) { showComplete(); return; }
-  stopAudio();
-
-  const pct = Math.round(idx / SENTENCES.length * 100);
-  document.getElementById('prog-fill').style.width = pct + '%';
-  document.getElementById('prog-num').innerHTML = `${idx + 1} <small>/ ${SENTENCES.length}</small>`;
-  document.getElementById('p-sub').textContent = `Sentence ${idx + 1} of ${SENTENCES.length} — press ▶ Play`;
-
-  answered = false; hintLevel = 0;
-  const card = document.getElementById('practice');
-  card.style.animation = 'none'; requestAnimationFrame(() => card.style.animation = '');
-
-  if (mode === 'dictation') {
-    document.getElementById('d-panel').style.display = 'block';
-    document.getElementById('s-panel').style.display = 'none';
-    document.getElementById('hint-box').style.display = 'none';
-    document.getElementById('hint-box').textContent = '';
-    document.getElementById('t-in').value = '';
-    document.getElementById('d-fb').style.display = 'none';
-    document.getElementById('nxt-btn').style.display = 'none';
-    document.getElementById('chk-btn').style.display = 'flex';
-    document.getElementById('hint-btn').disabled = false;
-    setTimeout(() => document.getElementById('t-in').focus(), 60);
-  } else {
-    document.getElementById('d-panel').style.display = 'none';
-    document.getElementById('s-panel').style.display = 'block';
-    document.getElementById('s-script').textContent = SENTENCES[idx][0];
-    document.getElementById('transcript-box').style.display = 'none';
-    document.getElementById('transcript-box').textContent = '';
-    document.getElementById('s-fb').style.display = 'none';
-    document.getElementById('mic-st').textContent = 'Press ▶ to hear, then tap mic to repeat';
-    document.getElementById('mic-st').className = 'mic-status';
-    document.getElementById('mic-btn').className = 'mic-btn';
-    document.getElementById('mic-btn').textContent = '🎤';
-    if (isRec) stopRec();
-  }
-}
-
-// ── Dictation ──────────────────────────────────────────
-function norm(s) {
-  return s.toLowerCase().replace(/[.,!?;:'"—–\-]/g, '').replace(/\s+/g, ' ').trim();
-}
-
-function doHint() {
-  hintLevel = Math.min(hintLevel + 1, 2);
-  const words = SENTENCES[idx][0].split(' ');
-  let h = '';
-  if (hintLevel === 1) h = words.length + ' words';
-  else h = words.map(w => w[0] + '_'.repeat(Math.max(w.length - 1, 1))).join('  ');
-  const el = document.getElementById('hint-box');
-  el.textContent = '💡 ' + h; el.style.display = 'block';
-  if (hintLevel >= 2) document.getElementById('hint-btn').disabled = true;
-}
-
-function doCheck() {
-  const val = document.getElementById('t-in').value.trim();
-  if (!val) { document.getElementById('t-in').focus(); return; }
-  stopAudio();
-
-  const target = SENTENCES[idx][0];
-  const iw = norm(val).split(' '), tw = norm(target).split(' ');
-  const perfect = norm(val) === norm(target);
-  const fb = document.getElementById('d-fb');
-  const head = document.getElementById('d-fb-h');
-  const body = document.getElementById('d-fb-b');
-  fb.style.display = 'block';
-
-  if (perfect) {
-    fb.className = 'fb ok';
-    head.textContent = '✅ Perfect! Well done!';
-    body.innerHTML = '';
-    correct++;
-    answered = true;
-    document.getElementById('chk-btn').style.display = 'none';
-    document.getElementById('nxt-btn').style.display = 'flex';
-  } else {
-    fb.className = 'fb bad';
-    head.textContent = '❌ Not quite — listen again:';
-    let h = ''; const max = Math.max(iw.length, tw.length);
-    for (let i = 0; i < max; i++) {
-      const a = iw[i], b = tw[i];
-      if (!a)      h += `<span class="w-miss">[ ? ] </span>`;
-      else if (a === b) h += `<span class="w-ok">${a} </span>`;
-      else         h += `<span class="w-err">${a} </span>`;
-    }
-    body.innerHTML = h;
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('t-in').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      answered ? doNext() : doCheck();
-    }
-  });
+// Auto redirect if already logged in
+auth.onAuthStateChanged(user => {
+  if (user) window.location.href = 'dashboard.html';
 });
 
-// ── Shadowing ──────────────────────────────────────────
-function toggleMic() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Speech recognition requires Google Chrome.'); return; }
-  isRec ? stopRec() : startRec();
+function setStatus(msg, isError=false) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (isError ? ' error' : '');
 }
-function startRec() {
-  stopAudio();
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recog = new SR(); recog.lang = 'en-US'; recog.interimResults = true;
-  isRec = true;
-  document.getElementById('mic-btn').className = 'mic-btn on';
-  document.getElementById('mic-btn').textContent = '⏹';
-  document.getElementById('mic-st').textContent = '🔴 Recording… speak now';
-  document.getElementById('mic-st').className = 'mic-status live';
-  const tb = document.getElementById('transcript-box');
-  tb.style.display = 'block'; tb.textContent = '…listening…';
 
-  let finalText = '';
-  recog.onresult = e => {
-    let interim = ''; finalText = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
-      else interim += e.results[i][0].transcript;
+async function signInGoogle() {
+  const btn = document.getElementById('google-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Signing in...';
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result = await auth.signInWithPopup(provider);
+    const user = result.user;
+    const today = new Date().toISOString().split('T')[0];
+
+    // Create or update user profile
+    const userRef = db.collection('users').doc(user.uid);
+    const doc = await userRef.get();
+
+    if (!doc.exists) {
+      await userRef.set({
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        streak: 0,
+        longestStreak: 0,
+        lastStudyDate: null,
+        totalSessions: 0,
+        totalCorrect: 0,
+        totalWrong: 0,
+        totalSeconds: 0,
+        progress: {}
+      });
     }
-    tb.textContent = finalText || interim || '…';
-  };
-  recog.onend = () => {
-    isRec = false;
-    document.getElementById('mic-btn').className = 'mic-btn';
-    document.getElementById('mic-btn').textContent = '🎤';
-    document.getElementById('mic-st').textContent = 'Done. Tap mic to record again.';
-    document.getElementById('mic-st').className = 'mic-status';
-    if (finalText) analyzeShad(finalText);
-  };
-  recog.onerror = e => {
-    isRec = false;
-    document.getElementById('mic-btn').className = 'mic-btn';
-    document.getElementById('mic-btn').textContent = '🎤';
-    const msgs = { 'no-speech': 'No speech detected.', 'not-allowed': 'Mic access denied.', 'network': 'Network error.' };
-    document.getElementById('mic-st').textContent = msgs[e.error] || 'Error: ' + e.error;
-    document.getElementById('mic-st').className = 'mic-status';
-  };
-  recog.start();
+    window.location.href = 'dashboard.html';
+  } catch(err) {
+    btn.disabled = false;
+    btn.innerHTML = `<svg class="google-svg" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continue with Google`;
+    if (err.code === 'auth/popup-closed-by-user') setStatus('Sign-in cancelled.');
+    else if (err.code === 'auth/popup-blocked') setStatus('Popup blocked — please allow popups for this site.', true);
+    else setStatus('Error: ' + err.message, true);
+  }
 }
-function stopRec() { if (recog) recog.stop(); isRec = false; }
-
-function analyzeShad(transcript) {
-  const tw = norm(SENTENCES[idx][0]).split(' ');
-  const rw = norm(transcript).split(' ');
-  const hits = rw.filter(w => tw.includes(w)).length;
-  const pct = Math.min(100, Math.round(hits / tw.length * 100));
-  const fb = document.getElementById('s-fb');
-  const head = document.getElementById('s-fb-h');
-  fb.style.display = 'block';
-  if (pct >= 80)      { fb.className = 'fb ok';  head.textContent = `✅ Excellent! ${pct}% match`; correct++; }
-  else if (pct >= 50) { fb.className = 'fb bad';  head.textContent = `🟡 ${pct}% — listen again and try once more.`; }
-  else                { fb.className = 'fb bad'; head.textContent = `🔁 ${pct}% — slow down and focus on each word.`; }
-}
-
-// ── Navigation ─────────────────────────────────────────
-function doNext() { idx++; render(); }
-
-// ── Complete ───────────────────────────────────────────
-function showComplete() {
-  stopAudio();
-  document.getElementById('practice').style.display = 'none';
-  document.getElementById('complete').style.display = 'block';
-  document.getElementById('prog-fill').style.width = '100%';
-  document.getElementById('prog-num').innerHTML = `${SENTENCES.length} <small>/ ${SENTENCES.length}</small>`;
-  const pct = Math.round(correct / SENTENCES.length * 100);
-  document.getElementById('c-sc').textContent = pct + '%';
-  let e = '🎉', t = 'Lesson Complete!', m = 'Great work finishing all the sentences!';
-  if (pct >= 90) { e = '🏆'; t = 'Outstanding!'; m = 'Near-perfect — you absolutely nailed it!' }
-  else if (pct >= 70) { e = '🌟'; t = 'Well done!'; m = 'Solid effort! Aim for 90%+ next time.' }
-  else if (pct < 40) { e = '💪'; t = 'Keep going!'; m = "Tough lesson — try again, you'll improve!" }
-  document.getElementById('c-em').textContent = e;
-  document.getElementById('c-ti').textContent = t;
-  document.getElementById('c-ms').textContent = m;
-}
-
-function restart() {
-  idx = 0; correct = 0; hintLevel = 0; answered = false;
-  document.getElementById('practice').style.display = 'block';
-  document.getElementById('complete').style.display = 'none';
-  render();
-}
-
-render();
 </script>
 </body>
 </html>
