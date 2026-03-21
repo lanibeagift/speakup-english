@@ -495,7 +495,9 @@ function analyzeShad(transcript) {
 }
 
 // ── Navigation ─────────────────────────────────────────
-function doNext() { idx++; render(); }
+function doNext() {
+  if (idx < SENTENCES.length) { idx++; render(); }
+}
 function goBack() { stopAudio(); window.location.href='dashboard.html'; }
 
 // ── Complete + Save to Firebase ────────────────────────
@@ -512,7 +514,6 @@ async function showComplete() {
   document.getElementById('prog-num').innerHTML=`${SENTENCES.length} <small>/ ${SENTENCES.length}</small>`;
   document.getElementById('c-sc').textContent=accuracy+'%';
 
-  // Pass / fail message
   document.getElementById('pass-msg').style.display = passed ? 'block' : 'none';
   document.getElementById('fail-msg').style.display = passed ? 'none' : 'block';
 
@@ -528,7 +529,6 @@ async function showComplete() {
   document.getElementById('c-ti').textContent=t;
   document.getElementById('c-ms').textContent=m;
 
-  // Save to Firestore only if passed
   if (currentUser) {
     try {
       const userRef = db.collection('users').doc(currentUser.uid);
@@ -541,7 +541,7 @@ async function showComplete() {
       const lastDate = data.lastStudyDate;
       const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
       const yesterdayStr = yesterday.toISOString().split('T')[0];
-      if (lastDate === today) { /* already studied today */ }
+      if (lastDate === today) { /* already today */ }
       else if (lastDate === yesterdayStr) { streak += 1; }
       else { streak = 1; }
       longestStreak = Math.max(longestStreak, streak);
@@ -550,27 +550,26 @@ async function showComplete() {
       if (!studyDates.includes(today)) studyDates.push(today);
       studyDates = studyDates.slice(-30);
 
-      // Build update object — always save session stats
-      const updateData = {
+      // Safely read existing nested objects
+      const existingProgress = data.progress || {};
+      const existingUnlocked = data.unlocked || {};
+
+      existingProgress[`${topicId}_${mode}`] = accuracy;
+      if (passed) existingUnlocked[`topic${topicId}`] = true;
+
+      // Use set+merge to avoid "field missing" errors
+      await userRef.set({
+        name: data.name || currentUser.displayName,
+        email: data.email || currentUser.email,
+        photo: data.photo || currentUser.photoURL,
         streak, longestStreak, lastStudyDate: today, studyDates,
-        totalSessions: firebase.firestore.FieldValue.increment(1),
-        totalCorrect: firebase.firestore.FieldValue.increment(correct),
-        totalWrong: firebase.firestore.FieldValue.increment(wrong),
-        totalSeconds: firebase.firestore.FieldValue.increment(duration),
-        [`progress.${topicId}_${mode}`]: accuracy,
-      };
-
-      // Only unlock next topic if passed (accuracy >= 80%)
-      if (passed) {
-        const nextTopicId = topicId + 1;
-        const allTopicIds = Object.keys(LESSONS_DATA).map(Number);
-        if (allTopicIds.includes(nextTopicId)) {
-          // Mark current topic as passed
-          updateData[`unlocked.topic${topicId}`] = true;
-        }
-      }
-
-      await userRef.update(updateData);
+        totalSessions: (data.totalSessions || 0) + 1,
+        totalCorrect: (data.totalCorrect || 0) + correct,
+        totalWrong: (data.totalWrong || 0) + wrong,
+        totalSeconds: (data.totalSeconds || 0) + duration,
+        progress: existingProgress,
+        unlocked: existingUnlocked,
+      }, { merge: true });
 
       // Add session record
       await userRef.collection('sessions').add({
@@ -584,6 +583,8 @@ async function showComplete() {
       document.getElementById('saving-note').style.display='block';
     } catch(err) {
       console.error('Save error:', err);
+      document.getElementById('saving-note').textContent = '⚠️ ' + err.message;
+      document.getElementById('saving-note').style.display='block';
     }
   }
 }
