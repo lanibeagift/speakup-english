@@ -15,7 +15,7 @@ const LESSONS_DATA = {
       ["I took a deep breath.",                                                         21.22, 23.28],
       ["Hi everyone, I'm Nga.",                                                         23.28, 25.70],
       ["I'm currently living in Da Nang.",                                              25.70, 28.32],
-      ["I work as a freelancer, so my schedule is pretty flexible.",                    28.32, 31.92],
+      ["I'm a student. I love learning languages.",                                     28.32, 31.92],
       ["The club owner nodded.",                                                        31.92, 33.48],
       ["That's great. What made you join us?",                                          33.48, 36.28],
       ["Good question.",                                                                36.28, 38.14],
