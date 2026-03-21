@@ -52,7 +52,7 @@ main{max-width:720px;margin:0 auto;padding:1.3rem 1.3rem 4rem}
 .c-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.3rem;padding:0.48rem 0.85rem;border-radius:8px;font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:500;cursor:pointer;border:none;transition:all 0.18s;white-space:nowrap}
 .c-play{background:var(--gold);color:#0e0c0a;font-weight:700;min-width:80px}
 .c-play:hover:not(:disabled){background:var(--gold2)}
-.c-play:disabled{opacity:0.0;cursor:not-allowed}
+.c-play:disabled{opacity:0.4;cursor:not-allowed}
 .c-repeat{background:none;border:1.5px solid var(--border2);color:var(--text3)}
 .c-repeat.on{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
 .speed-row{display:flex;align-items:center;gap:0.3rem;margin-left:auto}
@@ -372,15 +372,9 @@ function render() {
     if (isRec) stopRec();
   }
 
-  // Auto-play after short delay
-  if (audioLoaded) {
-    setTimeout(() => {
-      playCurrent();
-      if (mode === 'dictation') {
-        // Focus textarea after audio starts
-        setTimeout(() => document.getElementById('t-in').focus(), 300);
-      }
-    }, 400);
+  // No auto-play — user presses ▶ Play manually
+  if (mode === 'dictation') {
+    setTimeout(() => document.getElementById('t-in').focus(), 60);
   }
 }
 
