@@ -375,7 +375,11 @@ function render() {
 }
 
 // ── Dictation ──────────────────────────────────────────
-function norm(s) { return s.toLowerCase().replace(/[.,!?;:'"—–\-]/g,'').replace(/\s+/g,' ').trim(); }
+function norm(s) {
+  return s.toLowerCase()
+    .replace(/[.,!?;:"""—–\-]/g, '')  // remove punctuation but keep apostrophes
+    .replace(/\s+/g, ' ').trim();
+}
 
 function doHint() {
   hintLevel = Math.min(hintLevel+1, 2);
