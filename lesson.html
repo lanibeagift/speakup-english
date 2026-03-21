@@ -343,7 +343,7 @@ function render() {
   const pct = Math.round(idx / SENTENCES.length * 100);
   document.getElementById('prog-fill').style.width = pct + '%';
   document.getElementById('prog-num').innerHTML = `${idx+1} <small>/ ${SENTENCES.length}</small>`;
-  document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
+  document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length}`;
   answered = false; hintLevel = 0;
   const card = document.getElementById('practice');
   card.style.animation = 'none'; requestAnimationFrame(() => card.style.animation = '');
@@ -358,7 +358,6 @@ function render() {
     document.getElementById('nxt-btn').style.display = 'none';
     document.getElementById('chk-btn').style.display = 'flex';
     document.getElementById('hint-btn').disabled = false;
-    setTimeout(() => document.getElementById('t-in').focus(), 60);
   } else {
     document.getElementById('d-panel').style.display = 'none';
     document.getElementById('s-panel').style.display = 'block';
@@ -366,18 +365,30 @@ function render() {
     document.getElementById('s-script').classList.toggle('blurred', !scriptVisible);
     document.getElementById('transcript-box').style.display = 'none';
     document.getElementById('s-fb').style.display = 'none';
-    document.getElementById('mic-st').textContent = 'Press ▶ to hear, then tap mic to repeat';
+    document.getElementById('mic-st').textContent = 'Listening… tap mic to repeat';
     document.getElementById('mic-st').className = 'mic-status';
     document.getElementById('mic-btn').className = 'mic-btn';
     document.getElementById('mic-btn').textContent = '🎤';
     if (isRec) stopRec();
+  }
+
+  // Auto-play after short delay
+  if (audioLoaded) {
+    setTimeout(() => {
+      playCurrent();
+      if (mode === 'dictation') {
+        // Focus textarea after audio starts
+        setTimeout(() => document.getElementById('t-in').focus(), 300);
+      }
+    }, 400);
   }
 }
 
 // ── Dictation ──────────────────────────────────────────
 function norm(s) {
   return s.toLowerCase()
-    .replace(/[.,!?;:"""—–\-]/g, '')  // remove punctuation but keep apostrophes
+    .replace(/['']/g, '')       // remove apostrophes → I'm = im, don't = dont
+    .replace(/[.,!?;:"""—–\-]/g, '')  // remove all punctuation
     .replace(/\s+/g, ' ').trim();
 }
 
