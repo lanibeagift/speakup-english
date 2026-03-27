@@ -58,6 +58,25 @@ main{max-width:860px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
 .day-dot.done{background:var(--green);color:#0a1a12}
 .day-dot.today{border:2px solid var(--gold)}
 
+/* LEADERBOARD */
+.lb-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; }
+.lb-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.lb-title { font-size: 0.85rem; font-weight: 600; color: var(--gold); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 0.4rem; }
+.lb-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.lb-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem; border-radius: 10px; background: var(--card2); border: 1px solid transparent; transition: all 0.2s; }
+.lb-item:hover { border-color: var(--border2); background: var(--bg); }
+.lb-item.is-me { border-color: var(--gold-dim); background: var(--gold-bg); }
+.lb-rank { width: 26px; text-align: center; font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--text3); }
+.lb-rank.rank-1 { color: #ffd700; font-size: 1.3rem; }
+.lb-rank.rank-2 { color: #c0c0c0; font-size: 1.3rem; }
+.lb-rank.rank-3 { color: #cd7f32; font-size: 1.3rem; }
+.lb-av { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border2); }
+.lb-info { flex: 1; min-width: 0; }
+.lb-name { font-size: 0.85rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-stat { text-align: right; }
+.lb-score { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); line-height: 1; }
+.lb-label { font-size: 0.6rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+
 /* TOPICS */
 .section-title{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;margin-bottom:0.8rem}
 .topics-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1.2rem}
@@ -73,8 +92,8 @@ main{max-width:860px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
 .prog-rail{flex:1;height:4px;background:var(--border2);border-radius:4px;overflow:hidden}
 .prog-fill{height:100%;background:var(--gold);border-radius:4px;transition:width 0.6s}
 .prog-pct{font-size:0.68rem;color:var(--text3);width:28px;text-align:right}
-.topic-actions{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.7rem}
-.btn-mode{padding:0.45rem;border-radius:8px;border:1px solid var(--border2);background:var(--card2);font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.18s;text-align:center}
+.topic-actions{display:flex;gap:0.5rem;margin-top:0.7rem}
+.btn-mode{flex:1;padding:0.45rem 0.2rem;border-radius:8px;border:1px solid var(--border2);background:var(--card2);font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.18s;text-align:center}
 .btn-mode:hover{background:var(--gold);color:#0e0c0a;border-color:var(--gold)}
 
 /* HISTORY */
@@ -117,13 +136,11 @@ main{max-width:860px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
   <div id="loading" class="loading"><div class="spinner"></div></div>
   <div id="content" style="display:none">
 
-    <!-- GREETING -->
     <div class="greeting">
       <div class="greeting-sub" id="greeting-time">Good day</div>
       <h2 id="greeting-name">Welcome back, <em>...</em></h2>
     </div>
 
-    <!-- STATS -->
     <div class="stats-grid">
       <div class="stat-card streak-card">
         <div class="stat-label">🔥 Current streak</div>
@@ -147,7 +164,6 @@ main{max-width:860px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
       </div>
     </div>
 
-    <!-- STREAK WEEK -->
     <div class="streak-week">
       <div class="week-header">
         <span class="week-title">This week</span>
@@ -156,11 +172,19 @@ main{max-width:860px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
       <div class="week-days" id="week-days"></div>
     </div>
 
-    <!-- TOPICS -->
+    <div class="lb-card">
+      <div class="lb-header">
+        <div class="lb-title">🏆 Top Learners</div>
+        <span style="font-size:0.7rem; color:var(--text3)">By study time</span>
+      </div>
+      <div class="lb-list" id="leaderboard-list">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </div>
+
     <div class="section-title">Your lessons</div>
     <div class="topics-grid" id="topics-grid"></div>
 
-    <!-- HISTORY -->
     <div class="section-title">Recent sessions</div>
     <div class="history-list" id="history-list"></div>
 
@@ -245,6 +269,57 @@ auth.onAuthStateChanged(async user => {
     console.error(e);
   }
 
+  // Lấy dữ liệu Leaderboard theo Thời gian học
+  try {
+    const lbSnapshot = await db.collection('users')
+                               .orderBy('totalSeconds', 'desc')
+                               .limit(5)
+                               .get();
+                               
+    const lbList = document.getElementById('leaderboard-list');
+    lbList.innerHTML = '';
+    
+    if (lbSnapshot.empty) {
+      lbList.innerHTML = '<div class="empty-state">No data yet. Start learning!</div>';
+    } else {
+      let rank = 1;
+      lbSnapshot.forEach(doc => {
+        const u = doc.data();
+        const isMe = doc.id === user.uid;
+        const name = u.name || 'Student'; 
+        
+        // Tính toán số phút từ totalSeconds
+        const totalSecs = u.totalSeconds || 0;
+        const mins = Math.floor(totalSecs / 60);
+        
+        let rankDisplay = rank;
+        if (rank === 1) rankDisplay = '🥇';
+        else if (rank === 2) rankDisplay = '🥈';
+        else if (rank === 3) rankDisplay = '🥉';
+
+        const fallbackImg = `https://ui-avatars.com/api/?name=${name}&background=242018&color=d4a843`;
+        
+        lbList.innerHTML += `
+          <div class="lb-item ${isMe ? 'is-me' : ''}">
+            <div class="lb-rank rank-${rank}">${rankDisplay}</div>
+            <img class="lb-av" src="${u.photo || fallbackImg}" onerror="this.src='${fallbackImg}'">
+            <div class="lb-info">
+              <div class="lb-name">${name} ${isMe ? '<span style="color:var(--gold-dim);font-size:0.7rem">(You)</span>' : ''}</div>
+            </div>
+            <div class="lb-stat">
+              <div class="lb-score">${mins}</div>
+              <div class="lb-label">min</div>
+            </div>
+          </div>
+        `;
+        rank++;
+      });
+    }
+  } catch (error) {
+    console.error("Leaderboard error:", error);
+    document.getElementById('leaderboard-list').innerHTML = '<div class="empty-state" style="color:var(--red)">Failed to load leaderboard.</div>';
+  }
+
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = 'block';
 });
@@ -304,6 +379,7 @@ function renderTopics(progress, unlocked) {
               <span class="prog-pct">${sp}%</span>
             </div>
             <div class="topic-actions">
+              <button class="btn-mode" onclick="startLesson(${t.id},'listen')">🎧 Listen</button>
               <button class="btn-mode" onclick="startLesson(${t.id},'dictation')">✍️ Dictation</button>
               <button class="btn-mode" onclick="startLesson(${t.id},'shadowing')">🎤 Shadowing</button>
             </div>
@@ -346,7 +422,7 @@ function renderHistory(sessions) {
         <div class="h-icon">${topic?.emoji||'📚'}</div>
         <div class="h-info">
           <div class="h-title">${topic?.title||'Unknown topic'}</div>
-          <div class="h-meta">${s.mode==='dictation'?'✍️ Dictation':'🎤 Shadowing'} · ${mins} min</div>
+          <div class="h-meta">${s.mode==='dictation'?'✍️ Dictation':s.mode==='shadowing'?'🎤 Shadowing':'🎧 Full Listen'} · ${mins} min</div>
         </div>
         <div class="h-right">
           <div class="h-correct">✅ ${s.correct||0} correct</div>
