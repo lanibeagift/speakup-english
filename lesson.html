@@ -320,4 +320,363 @@ function playCurrent() {
 
   if (mode === 'listen') {
     // Nếu audio đã chạy hết mà ấn Play lại thì tua về đầu
-    if (audio.currentTime >= audio
+    if (audio.currentTime >= audio.duration - 0.5) audio.currentTime = 0;
+    
+    audio.playbackRate = audioSpeed;
+    audio.play();
+    isPlaying = true;
+    document.getElementById('wave').classList.add('on');
+    document.getElementById('play-btn').textContent = '◼ Pause';
+    document.getElementById('play-btn').onclick = stopAudio;
+    document.getElementById('p-sub').textContent = `🔊 Playing full audio…`;
+    
+    // Đổi màu text khớp với thời gian audio đang chạy
+    audio.ontimeupdate = () => {
+      const ct = audio.currentTime;
+      for (let i = 0; i < SENTENCES.length; i++) {
+        const el = document.getElementById(`lsent-${i}`);
+        if (!el) continue;
+        if (ct >= SENTENCES[i][1] && ct <= SENTENCES[i][2] + 0.1) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      }
+    };
+    audio.onended = () => { 
+      stopAudio(); 
+      document.getElementById('p-sub').textContent = 'Finished. Ready to practice?'; 
+      audio.ontimeupdate = null; 
+    };
+    return;
+  }
+
+  const [, start, end] = SENTENCES[idx];
+  const duration = (end - start) / audioSpeed;
+  audio.playbackRate = audioSpeed;
+  audio.currentTime = start;
+  audio.play();
+  isPlaying = true;
+  document.getElementById('wave').classList.add('on');
+  document.getElementById('play-btn').textContent = '◼ Stop';
+  document.getElementById('play-btn').onclick = stopAudio;
+  document.getElementById('p-sub').textContent = `🔊 Playing sentence ${idx + 1}…`;
+  stopTimer = setTimeout(() => {
+    stopAudio();
+    if (autoRepeat) stopTimer = setTimeout(playCurrent, 700);
+  }, duration * 1000 + 100);
+}
+
+function stopAudio() {
+  if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
+  audio.pause();
+  isPlaying = false;
+  document.getElementById('wave').classList.remove('on');
+  document.getElementById('play-btn').textContent = '▶ Play';
+  document.getElementById('play-btn').onclick = playCurrent;
+  
+  if (mode === 'listen') {
+    document.getElementById('p-sub').textContent = 'Paused';
+  } else {
+    document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
+  }
+}
+
+function toggleRepeat() {
+  autoRepeat = !autoRepeat;
+  document.getElementById('rep-btn').classList.toggle('on', autoRepeat);
+}
+
+function setSpeed(s, el) {
+  audioSpeed = s;
+  document.querySelectorAll('.spd').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  if (isPlaying) { stopAudio(); setTimeout(playCurrent, 200); }
+}
+
+// ── Render ─────────────────────────────────────────────
+function render() {
+  const card = document.getElementById('practice');
+  card.style.animation = 'none'; requestAnimationFrame(() => card.style.animation = '');
+
+  if (mode === 'listen') {
+    document.getElementById('d-panel').style.display = 'none';
+    document.getElementById('s-panel').style.display = 'none';
+    document.getElementById('l-panel').style.display = 'block';
+    document.getElementById('prog-bar').style.display = 'none'; // Ẩn thanh tiến trình vì nghe 1 lèo
+    document.getElementById('rep-btn').style.display = 'none'; // Ẩn nút Repeat
+    document.getElementById('p-sub').textContent = 'Press ▶ Play to listen to the whole story';
+
+    // Đổ toàn bộ text ra màn hình
+    const scriptHtml = SENTENCES.map((s, i) => `<span class="l-sent" id="lsent-${i}">${s[0]}</span>`).join(' ');
+    document.getElementById('l-script').innerHTML = scriptHtml;
+    return; // Dừng tại đây, không xử lý của Dictation/Shadowing
+  }
+
+  if (idx >= SENTENCES.length) { showComplete(); return; }
+  stopAudio();
+  const pct = Math.round(idx / SENTENCES.length * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-num').innerHTML = `${idx+1} <small>/ ${SENTENCES.length}</small>`;
+  document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length}`;
+  answered = false; hintLevel = 0;
+
+  if (mode === 'dictation') {
+    document.getElementById('d-panel').style.display = 'block';
+    document.getElementById('s-panel').style.display = 'none';
+    document.getElementById('l-panel').style.display = 'none';
+    document.getElementById('hint-box').style.display = 'none';
+    document.getElementById('hint-box').textContent = '';
+    document.getElementById('t-in').value = '';
+    document.getElementById('d-fb').style.display = 'none';
+    document.getElementById('nxt-btn').style.display = 'none';
+    document.getElementById('chk-btn').style.display = 'flex';
+    document.getElementById('hint-btn').disabled = false;
+  } else {
+    document.getElementById('d-panel').style.display = 'none';
+    document.getElementById('s-panel').style.display = 'block';
+    document.getElementById('l-panel').style.display = 'none';
+    document.getElementById('s-script').textContent = SENTENCES[idx][0];
+    document.getElementById('s-script').classList.toggle('blurred', !scriptVisible);
+    document.getElementById('transcript-box').style.display = 'none';
+    document.getElementById('s-fb').style.display = 'none';
+    document.getElementById('mic-st').textContent = 'Listening… tap mic to repeat';
+    document.getElementById('mic-st').className = 'mic-status';
+    document.getElementById('mic-btn').className = 'mic-btn';
+    document.getElementById('mic-btn').textContent = '🎤';
+    if (isRec) stopRec();
+  }
+
+  // No auto-play — user presses ▶ Play manually
+  if (mode === 'dictation') {
+    setTimeout(() => document.getElementById('t-in').focus(), 60);
+  }
+}
+
+// ── Dictation ──────────────────────────────────────────
+function norm(s) {
+  return s.toLowerCase()
+    .replace(/['']/g, '')       // remove apostrophes → I'm = im, don't = dont
+    .replace(/[.,!?;:"""—–\-]/g, '')  // remove all punctuation
+    .replace(/\s+/g, ' ').trim();
+}
+
+function doHint() {
+  hintLevel = Math.min(hintLevel+1, 2);
+  const words = SENTENCES[idx][0].split(' ');
+  const h = hintLevel===1 ? words.length+' words' : words.map(w=>w[0]+'_'.repeat(Math.max(w.length-1,1))).join('  ');
+  const el = document.getElementById('hint-box');
+  el.textContent = '💡 '+h; el.style.display = 'block';
+  if (hintLevel >= 2) document.getElementById('hint-btn').disabled = true;
+}
+
+function doCheck() {
+  const val = document.getElementById('t-in').value.trim();
+  if (!val) { document.getElementById('t-in').focus(); return; }
+  stopAudio();
+  const target = SENTENCES[idx][0];
+  const iw = norm(val).split(' '), tw = norm(target).split(' ');
+  const perfect = norm(val) === norm(target);
+  const fb = document.getElementById('d-fb');
+  const head = document.getElementById('d-fb-h');
+  const body = document.getElementById('d-fb-b');
+  fb.style.display = 'block';
+
+  if (perfect) {
+    fb.className = 'fb ok'; head.textContent = '✅ Perfect! Well done!'; body.innerHTML = ''; correct++;
+  } else {
+    fb.className = 'fb bad'; head.textContent = '❌ Not quite — see corrections:';
+    let h=''; const max=Math.max(iw.length,tw.length);
+    for(let i=0;i<max;i++){
+      const a=iw[i],b=tw[i];
+      if(!a) h+=`<span class="w-miss">[ ? ] </span>`;
+      else if(a===b) h+=`<span class="w-ok">${a} </span>`;
+      else h+=`<span class="w-err">${a} </span>`;
+    }
+    body.innerHTML = h;
+    wrong++;
+  }
+  answered = true;
+  document.getElementById('chk-btn').style.display = 'none';
+  document.getElementById('nxt-btn').style.display = 'flex';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('t-in').addEventListener('keydown', e => {
+    if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); answered?doNext():doCheck(); }
+  });
+});
+
+// ── Shadowing ──────────────────────────────────────────
+let scriptVisibleState = true;
+function toggleScript() {
+  scriptVisibleState = !scriptVisibleState;
+  document.getElementById('s-script').classList.toggle('blurred', !scriptVisibleState);
+  document.getElementById('toggle-btn').textContent = scriptVisibleState ? '👁 Hide script' : '👁 Show script';
+}
+
+function toggleMic() {
+  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  if (!SR) { alert('Speech recognition requires Google Chrome.'); return; }
+  isRec ? stopRec() : startRec();
+}
+
+function startRec() {
+  stopAudio();
+  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  recog = new SR(); recog.lang='en-US'; recog.interimResults=true;
+  isRec = true;
+  document.getElementById('mic-btn').className='mic-btn on';
+  document.getElementById('mic-btn').textContent='⏹';
+  document.getElementById('mic-st').textContent='🔴 Recording… speak now';
+  document.getElementById('mic-st').className='mic-status live';
+  const tb=document.getElementById('transcript-box');
+  tb.style.display='block'; tb.textContent='…listening…';
+  let finalText='';
+  recog.onresult=e=>{
+    let interim=''; finalText='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) finalText+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    tb.textContent=finalText||interim||'…';
+  };
+  recog.onend=()=>{
+    isRec=false;
+    document.getElementById('mic-btn').className='mic-btn';
+    document.getElementById('mic-btn').textContent='🎤';
+    document.getElementById('mic-st').textContent='Done. Tap mic to record again.';
+    document.getElementById('mic-st').className='mic-status';
+    if(finalText) analyzeShad(finalText);
+  };
+  recog.onerror=e=>{
+    isRec=false;
+    document.getElementById('mic-btn').className='mic-btn';
+    document.getElementById('mic-btn').textContent='🎤';
+    const msgs={'no-speech':'No speech detected.','not-allowed':'Mic access denied.','network':'Network error.'};
+    document.getElementById('mic-st').textContent=msgs[e.error]||'Error: '+e.error;
+    document.getElementById('mic-st').className='mic-status';
+  };
+  recog.start();
+}
+function stopRec() { if(recog) recog.stop(); isRec=false; }
+
+function analyzeShad(transcript) {
+  const tw=norm(SENTENCES[idx][0]).split(' ');
+  const rw=norm(transcript).split(' ');
+  const hits=rw.filter(w=>tw.includes(w)).length;
+  const pct=Math.min(100,Math.round(hits/tw.length*100));
+  const fb=document.getElementById('s-fb');
+  const head=document.getElementById('s-fb-h');
+  fb.style.display='block';
+  if(pct>=80){fb.className='fb ok';head.textContent=`✅ Excellent! ${pct}% match`;correct++;}
+  else if(pct>=50){fb.className='fb bad';head.textContent=`🟡 ${pct}% — listen again and try once more.`;}
+  else{fb.className='fb bad';head.textContent=`🔁 ${pct}% — slow down and focus on each word.`;}
+}
+
+// ── Navigation ─────────────────────────────────────────
+function doNext() {
+  if (idx < SENTENCES.length) { idx++; render(); }
+}
+function goBack() { stopAudio(); window.location.href='dashboard.html'; }
+
+// ── Complete + Save to Firebase ────────────────────────
+async function showComplete() {
+  stopAudio();
+  const duration = Math.floor((Date.now() - sessionStart) / 1000);
+  const accuracy = Math.round(correct / SENTENCES.length * 100);
+  const passed = accuracy >= 80;
+  const today = new Date().toISOString().split('T')[0];
+
+  document.getElementById('practice').style.display='none';
+  document.getElementById('complete').style.display='block';
+  document.getElementById('prog-fill').style.width='100%';
+  document.getElementById('prog-num').innerHTML=`${SENTENCES.length} <small>/ ${SENTENCES.length}</small>`;
+  document.getElementById('c-sc').textContent=accuracy+'%';
+
+  document.getElementById('pass-msg').style.display = passed ? 'block' : 'none';
+  document.getElementById('fail-msg').style.display = passed ? 'none' : 'block';
+
+  let e,t,m;
+  if (passed) {
+    if (accuracy>=90){e='🏆';t='Outstanding!';m='Near-perfect — you absolutely nailed it!'}
+    else {e='🎉';t='Lesson Passed!';m=`${accuracy}% accuracy — next topic is now unlocked!`}
+  } else {
+    if (accuracy>=60){e='😅';t='Almost there!';m=`${accuracy}% — you need 80% to pass. Keep going!`}
+    else {e='💪';t='Keep practicing!';m=`${accuracy}% — listen carefully and try again!`}
+  }
+  document.getElementById('c-em').textContent=e;
+  document.getElementById('c-ti').textContent=t;
+  document.getElementById('c-ms').textContent=m;
+
+  if (currentUser) {
+    try {
+      const userRef = db.collection('users').doc(currentUser.uid);
+      const doc = await userRef.get();
+      const data = doc.exists ? doc.data() : {};
+
+      // Streak logic
+      let streak = data.streak || 0;
+      let longestStreak = data.longestStreak || 0;
+      const lastDate = data.lastStudyDate;
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      if (lastDate === today) { /* already today */ }
+      else if (lastDate === yesterdayStr) { streak += 1; }
+      else { streak = 1; }
+      longestStreak = Math.max(longestStreak, streak);
+
+      let studyDates = data.studyDates || [];
+      if (!studyDates.includes(today)) studyDates.push(today);
+      studyDates = studyDates.slice(-30);
+
+      // Safely read existing nested objects
+      const existingProgress = data.progress || {};
+      const existingUnlocked = data.unlocked || {};
+
+      existingProgress[`${topicId}_${mode}`] = accuracy;
+      if (passed) existingUnlocked[`topic${topicId}`] = true;
+
+      // Use set+merge to avoid "field missing" errors
+      await userRef.set({
+        name: data.name || currentUser.displayName,
+        email: data.email || currentUser.email,
+        photo: data.photo || currentUser.photoURL,
+        streak, longestStreak, lastStudyDate: today, studyDates,
+        totalSessions: (data.totalSessions || 0) + 1,
+        totalCorrect: (data.totalCorrect || 0) + correct,
+        totalWrong: (data.totalWrong || 0) + wrong,
+        totalSeconds: (data.totalSeconds || 0) + duration,
+        progress: existingProgress,
+        unlocked: existingUnlocked,
+      }, { merge: true });
+
+      // Add session record
+      await userRef.collection('sessions').add({
+        topicId, mode,
+        date: new Date().toISOString(),
+        duration, correct, wrong,
+        total: SENTENCES.length,
+        accuracy, passed,
+      });
+
+      document.getElementById('saving-note').style.display='block';
+    } catch(err) {
+      console.error('Save error:', err);
+      document.getElementById('saving-note').textContent = '⚠️ ' + err.message;
+      document.getElementById('saving-note').style.display='block';
+    }
+  }
+}
+
+function restart() {
+  idx=0; correct=0; wrong=0; hintLevel=0; answered=false;
+  sessionStart = Date.now();
+  document.getElementById('practice').style.display='block';
+  document.getElementById('complete').style.display='none';
+  document.getElementById('saving-note').style.display='none';
+  render();
+}
+</script>
+</body>
+</html>
