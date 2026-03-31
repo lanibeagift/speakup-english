@@ -26,11 +26,8 @@ nav{background:rgba(14,12,10,0.95);backdrop-filter:blur(16px);border-bottom:1px 
 .nav-title{font-family:'Fraunces',serif;font-size:0.95rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav-sub{font-size:0.7rem;color:var(--text3)}
 .mode-pill{font-size:0.72rem;padding:0.25rem 0.7rem;border-radius:20px;font-weight:600;white-space:nowrap}
-.mode-pill.listen{background:var(--yellow-bg);color:var(--yellow)}
 .mode-pill.dictation{background:var(--gold-bg2);color:var(--gold2)}
 .mode-pill.shadowing{background:var(--green-bg);color:#86efac}
-.l-sent{transition:color 0.2s,font-weight 0.2s}
-.l-sent.active{color:var(--gold);font-weight:700}
 
 main{max-width:720px;margin:0 auto;padding:1.3rem 1.3rem 4rem}
 
@@ -130,6 +127,11 @@ textarea::placeholder{color:var(--text3)}
 .saving-note{font-size:0.75rem;color:var(--green);margin-bottom:1rem}
 .c-btns{display:flex;gap:0.7rem;justify-content:center;flex-wrap:wrap}
 
+/* Full story button */
+.c-full{background:none;border:1.5px solid var(--border2);color:var(--text2);gap:0.4rem}
+.c-full:hover{border-color:var(--gold-dim);color:var(--gold)}
+.c-full.playing{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+
 @media(max-width:500px){
   nav{padding:0.65rem 1rem}main{padding:1rem 1rem 3rem}.card{padding:1.1rem}
   .player{padding:0.9rem 1rem}.speed-row{margin-left:0;width:100%}
@@ -164,6 +166,7 @@ textarea::placeholder{color:var(--text3)}
     <div class="controls">
       <button class="c-btn c-play" id="play-btn" onclick="playCurrent()" disabled>▶ Play</button>
       <button class="c-btn c-repeat on" id="rep-btn" onclick="toggleRepeat()">🔁 Repeat</button>
+      <button class="c-btn c-full" id="full-btn" onclick="toggleFullStory()" disabled>🎧 Full story</button>
       <div class="speed-row">
         <span class="spd-lbl">Speed:</span>
         <button class="spd" onclick="setSpeed(0.75,this)">0.75×</button>
@@ -173,7 +176,7 @@ textarea::placeholder{color:var(--text3)}
     </div>
   </div>
 
-  <div class="prog" id="prog-bar">
+  <div class="prog">
     <div class="prog-track">
       <div class="prog-lbl">Progress</div>
       <div class="prog-rail"><div class="prog-fill" id="prog-fill"></div></div>
@@ -183,16 +186,8 @@ textarea::placeholder{color:var(--text3)}
 
   <div class="card" id="practice">
 
-    <div id="l-panel" style="display:none">
-      <div class="card-lbl">🎧 Listen to the full story</div>
-      <div class="script-box" id="l-script" style="font-size:1.02rem;line-height:1.8;margin-bottom:1.5rem"></div>
-      <div class="row">
-        <button class="btn btn-gold f1" onclick="switchTo('dictation')">✍️ Start Dictation →</button>
-        <button class="btn btn-green f1" style="display:flex" onclick="switchTo('shadowing')">🎤 Start Shadowing →</button>
-      </div>
-    </div>
-
-    <div id="d-panel" style="display:none">
+    <!-- DICTATION -->
+    <div id="d-panel">
       <div class="card-lbl">✍️ Listen &amp; type what you hear</div>
       <div class="hint-box" id="hint-box"></div>
       <textarea id="t-in" placeholder="Press ▶ Play to hear the sentence, then type it here…" rows="3"></textarea>
@@ -204,6 +199,7 @@ textarea::placeholder{color:var(--text3)}
       </div>
     </div>
 
+    <!-- SHADOWING -->
     <div id="s-panel" style="display:none">
       <div class="card-lbl">
         <span>🎤 Listen, then shadow the speaker</span>
@@ -228,6 +224,7 @@ textarea::placeholder{color:var(--text3)}
     <h2 id="c-ti">Lesson Complete!</h2>
     <p id="c-ms">Great work!</p>
     <div class="score-ring"><div class="score-big" id="c-sc">--</div><div class="score-lbl">accuracy</div></div>
+    <!-- Pass/fail message -->
     <div id="pass-msg" style="display:none;margin-bottom:0.8rem;padding:0.7rem 1rem;border-radius:10px;font-size:0.82rem;font-weight:500;background:var(--green-bg);border:1px solid var(--green-bd);color:#86efac">
       🎯 You passed! Next topic is now unlocked.
     </div>
@@ -284,7 +281,8 @@ auth.onAuthStateChanged(user => {
   audio.oncanplay = () => {
     audioLoaded = true;
     document.getElementById('play-btn').disabled = false;
-    document.getElementById('p-sub').textContent = mode === 'listen' ? 'Press ▶ Play to listen to the whole story' : `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
+    document.getElementById('full-btn').disabled = false;
+    document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
   };
   audio.onerror = () => {
     document.getElementById('p-sub').textContent = '⚠️ Audio file not found';
@@ -295,62 +293,18 @@ auth.onAuthStateChanged(user => {
   document.getElementById('p-icon').textContent = lesson.emoji;
   document.getElementById('p-title').textContent = lesson.title;
   document.getElementById('p-sub').textContent = 'Loading audio…';
-  
   const pill = document.getElementById('mode-pill');
-  if (mode === 'dictation') pill.textContent = '✍️ Dictation';
-  else if (mode === 'shadowing') pill.textContent = '🎤 Shadowing';
-  else pill.textContent = '🎧 Full Listen';
+  pill.textContent = mode === 'dictation' ? '✍️ Dictation' : '🎤 Shadowing';
   pill.className = 'mode-pill ' + mode;
-  
   document.getElementById('prog-num').innerHTML = `1 <small>/ ${SENTENCES.length}</small>`;
 
   render();
 });
 
-function switchTo(newMode) {
-  stopAudio();
-  sessionStorage.setItem('ll_mode', newMode);
-  window.location.reload();
-}
-
 // ── Audio ──────────────────────────────────────────────
 function playCurrent() {
   if (!audioLoaded) { document.getElementById('p-sub').textContent = '⏳ Loading audio…'; return; }
   if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
-
-  if (mode === 'listen') {
-    // Nếu audio đã chạy hết mà ấn Play lại thì tua về đầu
-    if (audio.currentTime >= audio.duration - 0.5) audio.currentTime = 0;
-    
-    audio.playbackRate = audioSpeed;
-    audio.play();
-    isPlaying = true;
-    document.getElementById('wave').classList.add('on');
-    document.getElementById('play-btn').textContent = '◼ Pause';
-    document.getElementById('play-btn').onclick = stopAudio;
-    document.getElementById('p-sub').textContent = `🔊 Playing full audio…`;
-    
-    // Đổi màu text khớp với thời gian audio đang chạy
-    audio.ontimeupdate = () => {
-      const ct = audio.currentTime;
-      for (let i = 0; i < SENTENCES.length; i++) {
-        const el = document.getElementById(`lsent-${i}`);
-        if (!el) continue;
-        if (ct >= SENTENCES[i][1] && ct <= SENTENCES[i][2] + 0.1) {
-          el.classList.add('active');
-        } else {
-          el.classList.remove('active');
-        }
-      }
-    };
-    audio.onended = () => { 
-      stopAudio(); 
-      document.getElementById('p-sub').textContent = 'Finished. Ready to practice?'; 
-      audio.ontimeupdate = null; 
-    };
-    return;
-  }
-
   const [, start, end] = SENTENCES[idx];
   const duration = (end - start) / audioSpeed;
   audio.playbackRate = audioSpeed;
@@ -371,15 +325,51 @@ function stopAudio() {
   if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
   audio.pause();
   isPlaying = false;
+  isFullPlaying = false;
   document.getElementById('wave').classList.remove('on');
   document.getElementById('play-btn').textContent = '▶ Play';
   document.getElementById('play-btn').onclick = playCurrent;
-  
-  if (mode === 'listen') {
-    document.getElementById('p-sub').textContent = 'Paused';
-  } else {
-    document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
+  document.getElementById('full-btn').textContent = '🎧 Full story';
+  document.getElementById('full-btn').classList.remove('playing');
+  document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
+}
+
+// ── Full story playback ────────────────────────────────
+let isFullPlaying = false;
+
+function toggleFullStory() {
+  if (!audioLoaded) return;
+  if (isFullPlaying) {
+    stopAudio();
+    return;
   }
+  // Stop any sentence playback
+  if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
+  audio.pause();
+  isPlaying = false;
+  document.getElementById('play-btn').textContent = '▶ Play';
+  document.getElementById('play-btn').onclick = playCurrent;
+
+  // Play from start
+  isFullPlaying = true;
+  audio.playbackRate = audioSpeed;
+  audio.currentTime = 0;
+  audio.play();
+
+  document.getElementById('wave').classList.add('on');
+  document.getElementById('full-btn').textContent = '⏹ Stop';
+  document.getElementById('full-btn').classList.add('playing');
+  document.getElementById('p-sub').textContent = '🎧 Playing full story…';
+
+  // When full audio ends naturally
+  audio.onended = () => {
+    isFullPlaying = false;
+    document.getElementById('wave').classList.remove('on');
+    document.getElementById('full-btn').textContent = '🎧 Full story';
+    document.getElementById('full-btn').classList.remove('playing');
+    document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
+    audio.onended = null;
+  };
 }
 
 function toggleRepeat() {
@@ -396,23 +386,6 @@ function setSpeed(s, el) {
 
 // ── Render ─────────────────────────────────────────────
 function render() {
-  const card = document.getElementById('practice');
-  card.style.animation = 'none'; requestAnimationFrame(() => card.style.animation = '');
-
-  if (mode === 'listen') {
-    document.getElementById('d-panel').style.display = 'none';
-    document.getElementById('s-panel').style.display = 'none';
-    document.getElementById('l-panel').style.display = 'block';
-    document.getElementById('prog-bar').style.display = 'none'; // Ẩn thanh tiến trình vì nghe 1 lèo
-    document.getElementById('rep-btn').style.display = 'none'; // Ẩn nút Repeat
-    document.getElementById('p-sub').textContent = 'Press ▶ Play to listen to the whole story';
-
-    // Đổ toàn bộ text ra màn hình
-    const scriptHtml = SENTENCES.map((s, i) => `<span class="l-sent" id="lsent-${i}">${s[0]}</span>`).join(' ');
-    document.getElementById('l-script').innerHTML = scriptHtml;
-    return; // Dừng tại đây, không xử lý của Dictation/Shadowing
-  }
-
   if (idx >= SENTENCES.length) { showComplete(); return; }
   stopAudio();
   const pct = Math.round(idx / SENTENCES.length * 100);
@@ -420,11 +393,12 @@ function render() {
   document.getElementById('prog-num').innerHTML = `${idx+1} <small>/ ${SENTENCES.length}</small>`;
   document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length}`;
   answered = false; hintLevel = 0;
+  const card = document.getElementById('practice');
+  card.style.animation = 'none'; requestAnimationFrame(() => card.style.animation = '');
 
   if (mode === 'dictation') {
     document.getElementById('d-panel').style.display = 'block';
     document.getElementById('s-panel').style.display = 'none';
-    document.getElementById('l-panel').style.display = 'none';
     document.getElementById('hint-box').style.display = 'none';
     document.getElementById('hint-box').textContent = '';
     document.getElementById('t-in').value = '';
@@ -435,7 +409,6 @@ function render() {
   } else {
     document.getElementById('d-panel').style.display = 'none';
     document.getElementById('s-panel').style.display = 'block';
-    document.getElementById('l-panel').style.display = 'none';
     document.getElementById('s-script').textContent = SENTENCES[idx][0];
     document.getElementById('s-script').classList.toggle('blurred', !scriptVisible);
     document.getElementById('transcript-box').style.display = 'none';
