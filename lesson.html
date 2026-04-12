@@ -186,7 +186,6 @@ textarea::placeholder{color:var(--text3)}
 
   <div class="card" id="practice">
 
-    <!-- DICTATION -->
     <div id="d-panel">
       <div class="card-lbl">✍️ Listen &amp; type what you hear</div>
       <div class="hint-box" id="hint-box"></div>
@@ -199,7 +198,6 @@ textarea::placeholder{color:var(--text3)}
       </div>
     </div>
 
-    <!-- SHADOWING -->
     <div id="s-panel" style="display:none">
       <div class="card-lbl">
         <span>🎤 Listen, then shadow the speaker</span>
@@ -224,7 +222,6 @@ textarea::placeholder{color:var(--text3)}
     <h2 id="c-ti">Lesson Complete!</h2>
     <p id="c-ms">Great work!</p>
     <div class="score-ring"><div class="score-big" id="c-sc">--</div><div class="score-lbl">accuracy</div></div>
-    <!-- Pass/fail message -->
     <div id="pass-msg" style="display:none;margin-bottom:0.8rem;padding:0.7rem 1rem;border-radius:10px;font-size:0.82rem;font-weight:500;background:var(--green-bg);border:1px solid var(--green-bd);color:#86efac">
       🎯 You passed! Next topic is now unlocked.
     </div>
@@ -426,7 +423,7 @@ function render() {
 }
 
 // ── Dictation ──────────────────────────────────────────
-function norm(s) {
+
 // Thêm hàm để quy đổi các từ viết tắt phổ biến về dạng đầy đủ
 function expandContractions(str) {
   let s = str.toLowerCase();
