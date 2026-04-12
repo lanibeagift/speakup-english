@@ -427,10 +427,34 @@ function render() {
 
 // ── Dictation ──────────────────────────────────────────
 function norm(s) {
-  return s.toLowerCase()
-    .replace(/['']/g, '')       // remove apostrophes → I'm = im, don't = dont
-    .replace(/[.,!?;:"""—–\-]/g, '')  // remove all punctuation
-    .replace(/\s+/g, ' ').trim();
+// Thêm hàm để quy đổi các từ viết tắt phổ biến về dạng đầy đủ
+function expandContractions(str) {
+  let s = str.toLowerCase();
+  
+  s = s.replace(/i['’]m/g, "i am");
+  s = s.replace(/can['’]t/g, "cannot");
+  s = s.replace(/won['’]t/g, "will not");
+  s = s.replace(/n['’]t/g, " not");
+  s = s.replace(/['’]re/g, " are");
+  s = s.replace(/it['’]s/g, "it is");
+  s = s.replace(/that['’]s/g, "that is");
+  s = s.replace(/he['’]s/g, "he is");
+  s = s.replace(/she['’]s/g, "she is");
+  s = s.replace(/what['’]s/g, "what is");
+  s = s.replace(/let['’]s/g, "let us");
+  s = s.replace(/who['’]s/g, "who is");
+  s = s.replace(/there['’]s/g, "there is");
+  s = s.replace(/['’]ll/g, " will");
+  s = s.replace(/['’]ve/g, " have");
+  s = s.replace(/['’]d/g, " would");
+
+  return s;
+}
+
+function norm(s) {
+  return expandContractions(s)
+    .replace(/[.,!?;:"""—–\-]/g, '')  // Xóa toàn bộ dấu câu
+    .replace(/\s+/g, ' ').trim();     // Chuẩn hóa khoảng trắng thừa
 }
 
 function doHint() {
