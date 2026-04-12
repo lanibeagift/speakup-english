@@ -242,7 +242,7 @@ const LESSONS_DATA = {
       ["A habit isn't ruined by a bad week.",                                             88.53, 90.85],
       ["It's ruined by deciding not to go back.",                                         91.36, 93.51],
       ["Tonight, I went back.",                                                           94.01, 96.81],
-      ["And that felt like enough.",                                                      97.85, 100.50],
+      ["And that felt like enough.",                                                      97.85, 100.55],
     ]
   },
   6: {
