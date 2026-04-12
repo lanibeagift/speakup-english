@@ -45,7 +45,7 @@ const LESSONS_DATA = {
   ["The club owner clapped her hands.",                           13.46,  15.19],
   ["Alright everyone! Today's theme is Women's Day.",             15.75,  19.73],
   ["She smiled.",                                                 20.00,  21.00],
-  ["Each person will say a few sentences to celebrate a woman in their life.", 21.00, 26.00],
+  ["Each person will say a few sentences to celebrate a woman in their life.", 21.00, 26.50],
   ["Oh. A mini speech.",                                          27.00,  29.00],
   ["My heart was beating a little faster.",                       29.02,  32.00],
   ["But not like last week.",                                     32.00,  33.00],
