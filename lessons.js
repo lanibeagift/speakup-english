@@ -430,7 +430,7 @@ const LESSONS_DATA = {
       "In a place as famous as Hoi An, it’s easy to get lost in the crowds.",
       "By sharing these small tips, I hoped she could find those quiet, peaceful moments that make a trip truly meaningful."
     ]
-  }
+  },
 10: {
     id: 10,
     title: "The Road to Hue",
