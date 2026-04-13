@@ -601,16 +601,43 @@ function startRec() {
 function stopRec() { if(recog) recog.stop(); isRec=false; }
 
 function analyzeShad(transcript) {
-  const tw=norm(SENTENCES[idx][0]).split(' ');
-  const rw=norm(transcript).split(' ');
-  const hits=rw.filter(w=>tw.includes(w)).length;
-  const pct=Math.min(100,Math.round(hits/tw.length*100));
-  const fb=document.getElementById('s-fb');
-  const head=document.getElementById('s-fb-h');
-  fb.style.display='block';
-  if(pct>=80){fb.className='fb ok';head.textContent=`✅ Excellent! ${pct}% match`;correct++;}
-  else if(pct>=50){fb.className='fb bad';head.textContent=`🟡 ${pct}% — listen again and try once more.`;}
-  else{fb.className='fb bad';head.textContent=`🔁 ${pct}% — slow down and focus on each word.`;}
+  // Lấy mảng từ của câu gốc và câu người dùng đọc
+  const tw = norm(SENTENCES[idx][0]).split(' ');
+  const rw = norm(transcript).split(' ');
+
+  let hits = 0;
+  let targetWords = [...tw]; // Tạo một bản sao của câu gốc để đối chiếu
+
+  // Kiểm tra từng từ người dùng đọc
+  for (let word of rw) {
+    if (!word) continue; // Bỏ qua khoảng trắng rỗng
+    
+    // Tìm vị trí của từ này trong câu gốc
+    const foundIdx = targetWords.indexOf(word);
+    if (foundIdx !== -1) {
+      hits++;
+      targetWords.splice(foundIdx, 1); // Xóa từ đã khớp để không tính lặp (chống spam 1 từ)
+    }
+  }
+
+  // Tính phần trăm chính xác (tối đa 100%)
+  const pct = Math.min(100, Math.round((hits / tw.length) * 100));
+
+  const fb = document.getElementById('s-fb');
+  const head = document.getElementById('s-fb-h');
+  fb.style.display = 'block';
+
+  if (pct >= 80) {
+    fb.className = 'fb ok';
+    head.textContent = `✅ Excellent! ${pct}% match`;
+    correct++;
+  } else if (pct >= 50) {
+    fb.className = 'fb bad';
+    head.textContent = `🟡 ${pct}% — listen again and try once more.`;
+  } else {
+    fb.className = 'fb bad';
+    head.textContent = `🔁 ${pct}% — slow down and focus on each word.`;
+  }
 }
 
 // ── Navigation ─────────────────────────────────────────
