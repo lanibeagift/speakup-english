@@ -1,9 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
-
-/**
- * DỮ LIỆU BÀI HỌC (Đã được tối giản, không còn timestamps và youtubeUrl)
- * Cấu trúc: [id]: { title, emoji, sentences: [ "Câu 1", "Câu 2", ... ] }
- */
 const LESSONS_DATA = {
   1: {
     id: 1,
@@ -297,174 +291,36 @@ const LESSONS_DATA = {
       "It was crowded and noisy, as usual.",
       "I saw Sarah and her family at a food stall.",
       "Her family was busy eating, but Sarah was standing aside, looking at the snack stalls with a bit of hesitation.",
-      "Speaker 1: Sarah? Hi! What a surprise!",
-      "Speaker 2: Oh, Rose! Hi! What a small world! It's so good to see you again.",
-      "Speaker 1: Good to see you too! How's it going? The market is pretty crazy today, huh?",
-      "Speaker 2: Yeah, it's a bit much!",
+      "Sarah? Hi! What a surprise!",
+      "Oh, Rose! Hi! What a small world! It's so good to see you again.",
+      "Good to see you too! How's it going? The market is pretty crazy today, huh?",
+      "Yeah, it's a bit much!",
       "But my family is over there—they're having a great time trying the local food.",
       "I want to buy some snacks to take home, but everything looks great, and there are so many options!",
       "I'm not sure which one is the best.",
-      "Speaker 1: I totally understand.",
+      "I totally understand.",
       "Well, these are Anatta soft-dried bananas.",
       "They're a local favorite—really sweet and healthy.",
       "I buy them all the time.",
-      "Speaker 2: Oh, they look good!",
+      "Oh, they look good!",
       "But I don't see any price tags.",
       "Should I just hand her some cash and hope for the best?",
-      "Speaker 1: In local markets, it's better to ask first.",
+      "In local markets, it's better to ask first.",
       "You might even get a better deal if you buy a few packs.",
       "Do you want to try asking in Vietnamese?",
-      "Speaker 2: I'd love to, but I don't know how!",
-      "Speaker 1: It's easy.",
+      "I'd love to, but I don't know how!",
+      "It's easy.",
       "Just say: Bao nhiêu tiền?",
-      "Speaker 2: Bao... nhiêu... tiền? Did I get that right?",
-      "Speaker 1: Perfect!",
+      "Bao... nhiêu... tiền? Did I get that right?",
+      "Perfect!",
       "Go ahead, I'm right here if you need me.",
-      "Speaker 2: That was actually fun!",
+      "That was actually fun!",
       "Thanks, Rose.",
       "I'm so glad I ran into you.",
-      "Speaker 1: Me too. I'm just happy I could help.",
+      "Me too. I'm just happy I could help.",
       "I helped Sarah pick out her gifts, and we swapped numbers.",
       "On the way home, I realized something simple: Speaking a language isn't just about grammar.",
       "It's about showing up, helping out, and making a connection."
     ]
   }
 };
-
-const LessonReader = () => {
-  const [currentId, setCurrentId] = useState(1);
-  const [playingIdx, setPlayingIdx] = useState(-1);
-  const [selectedVoice, setSelectedVoice] = useState(null);
-  const synth = useRef(window.speechSynthesis);
-  
-  const lesson = LESSONS_DATA[currentId];
-
-  // 1. Tự động tìm giọng Mỹ chất lượng cao khi load ứng dụng
-  useEffect(() => {
-    const initVoices = () => {
-      const voices = synth.current.getVoices();
-      const bestVoice = 
-        voices.find(v => v.name === 'Google US English') ||
-        voices.find(v => v.name.includes('Samantha') && v.lang === 'en-US') ||
-        voices.find(v => (v.name.includes('Aria') || v.name.includes('Guy')) && v.lang === 'en-US') ||
-        voices.find(v => v.lang === 'en-US') ||
-        voices[0];
-      setSelectedVoice(bestVoice);
-    };
-
-    if (synth.current.onvoiceschanged !== undefined) {
-      synth.current.onvoiceschanged = initVoices;
-    }
-    initVoices();
-
-    return () => synth.current.cancel();
-  }, []);
-
-  // 2. Hàm dọn dẹp văn bản trước khi đọc (loại bỏ Speaker 1, Rose, ...)
-  const cleanText = (text) => text.replace(/^(Speaker \d+|Rose|Sarah): /i, '');
-
-  // 3. Đọc 1 câu đơn lẻ (Shadowing mode)
-  const speakOne = (text, index) => {
-    synth.current.cancel();
-    const utter = new SpeechSynthesisUtterance(cleanText(text));
-    if (selectedVoice) utter.voice = selectedVoice;
-    
-    utter.rate = 0.9; // Tốc độ 0.9 giúp học viên nghe rõ hơn
-    utter.onstart = () => setPlayingIdx(index);
-    utter.onend = () => setPlayingIdx(-1);
-    
-    synth.current.speak(utter);
-  };
-
-  // 4. Đọc toàn bài học
-  const speakAll = (startIdx = 0) => {
-    synth.current.cancel();
-    let idx = startIdx;
-
-    const playNext = () => {
-      if (idx >= lesson.sentences.length) {
-        setPlayingIdx(-1);
-        return;
-      }
-      const utter = new SpeechSynthesisUtterance(cleanText(lesson.sentences[idx]));
-      if (selectedVoice) utter.voice = selectedVoice;
-      utter.rate = 0.9;
-      utter.onstart = () => setPlayingIdx(idx);
-      utter.onend = () => {
-        idx++;
-        playNext();
-      };
-      synth.current.speak(utter);
-    };
-    playNext();
-  };
-
-  const stop = () => {
-    synth.current.cancel();
-    setPlayingIdx(-1);
-  };
-
-  return (
-    <div style={{ maxWidth: '800px', margin: '40px auto', padding: '20px', fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif', color: '#334155' }}>
-      
-      {/* HEADER & SELECTOR */}
-      <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '16px', marginBottom: '30px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '24px', color: '#1e293b' }}>{lesson.emoji} {lesson.title}</h1>
-            <p style={{ margin: '5px 0 0', color: '#64748b', fontSize: '14px' }}>Học tiếng Anh qua câu chuyện của Be A Gift</p>
-          </div>
-          <select 
-            value={currentId} 
-            onChange={(e) => { stop(); setCurrentId(Number(e.target.value)); }}
-            style={{ padding: '10px 15px', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none', cursor: 'pointer', background: 'white' }}
-          >
-            {Object.values(LESSONS_DATA).map(ls => (
-              <option key={ls.id} value={ls.id}>Bài {ls.id}: {ls.title}</option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
-          <button onClick={() => speakAll(0)} style={{ flex: 1, padding: '12px', borderRadius: '10px', border: 'none', background: '#0ea5e9', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>▶ Đọc toàn bài</button>
-          <button onClick={stop} style={{ flex: 1, padding: '12px', borderRadius: '10px', border: 'none', background: '#ef4444', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>⏹ Dừng lại</button>
-        </div>
-      </div>
-
-      {/* LIST SENTENCES */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {lesson.sentences.map((text, i) => (
-          <div 
-            key={i} 
-            onClick={() => speakOne(text, i)}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '15px', 
-              padding: '16px', 
-              borderRadius: '12px', 
-              cursor: 'pointer',
-              transition: '0.2s',
-              backgroundColor: playingIdx === i ? '#f0f9ff' : 'white',
-              border: playingIdx === i ? '1px solid #0ea5e9' : '1px solid #f1f5f9',
-              boxShadow: playingIdx === i ? '0 4px 12px rgba(14, 165, 233, 0.1)' : 'none'
-            }}
-          >
-            <div style={{ color: playingIdx === i ? '#0ea5e9' : '#94a3b8', fontSize: '20px' }}>
-              {playingIdx === i ? '🔊' : '🔈'}
-            </div>
-            <span style={{ fontSize: '18px', lineHeight: '1.6', color: playingIdx === i ? '#0369a1' : '#334155' }}>
-              {text}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <footer style={{ marginTop: '40px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>
-        Thiết bị đang sử dụng giọng đọc: {selectedVoice?.name || 'Đang tải...'}
-      </footer>
-    </div>
-  );
-};
-
-export default LessonReader;
