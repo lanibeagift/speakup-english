@@ -1,10 +1,3 @@
-Chào bạn, phần HTML (giao diện) bạn sửa đã **rất chính xác** rồi (bạn đã thay thẻ `<audio>` bằng thẻ `<div>` chứa YouTube). 
-
-Tuy nhiên, phần **JavaScript (code logic ở cuối file)** của bạn thì **vẫn đang là code cũ dùng cho thẻ `<audio>`**. Nếu bạn chạy file này, nó sẽ báo lỗi ngay lập tức vì không tìm thấy thẻ `audio` nào để phát cả.
-
-Mình đã gom toàn bộ code YouTube API (mà mình hướng dẫn ở bước trước) và tích hợp hoàn chỉnh vào file của bạn. Bạn chỉ cần **copy toàn bộ nội dung dưới đây và ghi đè (thay thế hoàn toàn)** vào file `practice.html` hiện tại của bạn là hệ thống sẽ chạy mượt mà với YouTube nhé:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
