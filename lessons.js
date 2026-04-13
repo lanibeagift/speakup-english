@@ -84,7 +84,7 @@ const LESSONS_DATA = {
     emoji: "👨‍👩‍👧‍👦",
     youtubeUrl: "https://youtu.be/t8LQjuotcjY",
     sentences: [
-      ["Story. Talking about Family.",                                                 0.26,  2.04],
+      ["Talking about Family.",                                                 0.26,  2.04],
       ["A week later, I went back to the English club.",                               2.53,  5.71],
       ["This was my third time!",                                                      6.17,  8.17],
       ["When I opened the door, I saw many familiar faces.",                           8.79, 12.49],
