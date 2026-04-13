@@ -85,10 +85,10 @@ const LESSONS_DATA = {
     youtubeUrl: "https://youtu.be/t8LQjuotcjY",
     sentences: [
       ["Talking about Family.",                                                 0.26,  2.04],
-      ["A week later, I went back to the English club.",                               2.53,  5.71],
+      ["A week later, I went back to the English club.",                               2.53,  6.01],
       ["This was my third time!",                                                      6.17,  8.17],
       ["When I opened the door, I saw many familiar faces.",                           8.79, 12.49],
-      ["Some people waved at me and said, Hi Rose!",                                  13.02, 15.18],
+      ["Some people waved at me and said, Hi Rose!",                                  13.02, 15.48],
       ["I gave them a big smile and waved back.",                                     15.55, 16.44],
       ["Then I found a seat and sat down.",                                           17.03, 20.00],
       ["Soon, the club owner stood up and clapped her hands.",                         20.64, 22.65],
