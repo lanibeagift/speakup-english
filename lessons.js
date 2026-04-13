@@ -1,332 +1,470 @@
+import React, { useState, useEffect, useRef } from 'react';
+
+/**
+ * DỮ LIỆU BÀI HỌC (Đã được tối giản, không còn timestamps và youtubeUrl)
+ * Cấu trúc: [id]: { title, emoji, sentences: [ "Câu 1", "Câu 2", ... ] }
+ */
 const LESSONS_DATA = {
   1: {
     id: 1,
     title: "Tell me about yourself",
     emoji: "👤",
-    youtubeUrl: "https://youtu.be/I5Su_8x1qYw",
     sentences: [
-      ["I walked into the English club a few minutes late.",                             0.00,  3.88],
-      ["Great. Perfect timing.",                                                         3.88,  6.22],
-      ["The club owner looked at me and smiled.",                                        6.22,  9.12],
-      ["Hi! You must be new.",                                                           9.12, 11.30],
-      ["Yes, I am, I said, trying not to sound too nervous.",                           11.30, 15.62],
-      ["Welcome! Why don't you go ahead and introduce yourself?",                       15.62, 19.10],
-      ["Of course. Right away.",                                                        19.10, 21.22],
-      ["I took a deep breath.",                                                         21.22, 23.28],
-      ["Hi everyone, I'm Rose.",                                                        23.28, 25.70],
-      ["I'm currently living in Da Nang.",                                              25.70, 28.32],
-      ["I'm a student. I love learning languages.",                                     28.32, 31.92],
-      ["The club owner nodded.",                                                        31.92, 33.48],
-      ["That's great. What made you join us?",                                          33.48, 36.28],
-      ["Good question.",                                                                36.28, 38.14],
-      ["Well, I said, I realized that every time someone says,",                        38.14, 42.68],
-      ["Tell me about yourself, my brain just freezes.",                                42.68, 46.86],
-      ["So I figured it was time to step out of my comfort zone.",                      46.86, 51.10],
-      ["No one laughed.",                                                               51.10, 52.44],
-      ["One member said, trust me, we've all been there.",                              52.44, 56.38],
-      ["I smiled.",                                                                     56.38, 57.62],
-      ["Okay, that makes me feel better.",                                              57.62, 60.20],
-      ["By the end of the session, I was chatting with two new friends like it was no big deal.", 60.20, 66.00],
-      ["That night, I thought about something simple.",                                 66.00, 69.58],
-      ["You don't need perfect grammar to connect with people.",                        69.58, 72.96],
-      ["You just need the courage to speak up.",                                        72.96, 75.60],
+      "I walked into the English club a few minutes late.",
+      "Great. Perfect timing.",
+      "The club owner looked at me and smiled.",
+      "Hi! You must be new.",
+      "Yes, I am, I said, trying not to sound too nervous.",
+      "Welcome! Why don't you go ahead and introduce yourself?",
+      "Of course. Right away.",
+      "I took a deep breath.",
+      "Hi everyone, I'm Rose.",
+      "I'm currently living in Da Nang.",
+      "I'm a student. I love learning languages.",
+      "The club owner nodded.",
+      "That's great. What made you join us?",
+      "Good question.",
+      "Well, I said, I realized that every time someone says,",
+      "Tell me about yourself, my brain just freezes.",
+      "So I figured it was time to step out of my comfort zone.",
+      "No one laughed.",
+      "One member said, trust me, we've all been there.",
+      "I smiled.",
+      "Okay, that makes me feel better.",
+      "By the end of the session, I was chatting with two new friends like it was no big deal.",
+      "That night, I thought about something simple.",
+      "You don't need perfect grammar to connect with people.",
+      "You just need the courage to speak up."
     ]
   },
   2: {
     id: 2,
     title: "A Small Speech for Women's Day",
     emoji: "🌸",
-    youtubeUrl: "https://youtu.be/vQExTt5TyKc",
     sentences: [
-      ["Story. A Small Speech for Women's Day.",                       0.26,   3.55],
-      ["A week later, I went back to the English club.",               4.57,   7.30],
-      ["This time, I arrived early.",                                  7.83,   9.88],
-      ["The room felt warm and friendly.",                            10.51,  12.87],
-      ["The club owner clapped her hands.",                           13.46,  15.19],
-      ["Alright everyone! Today's theme is Women's Day.",             15.75,  19.73],
-      ["She smiled.",                                                 20.00,  21.00],
-      ["Each person will say a few sentences to celebrate a woman in their life.", 21.00, 26.55],
-      ["Oh. A mini speech.",                                          27.00,  29.25],
-      ["My heart was beating a little faster.",                       29.30,  32.00],
-      ["But not like last week.",                                     32.00,  33.45],
-      ["I took a deep breath.",                                       33.46,  35.50],
-      ["Again.",                                                      35.51,  36.15],
-      ["The first few members spoke.",                                36.15,  39.40],
-      ["One talked about her mother.",                                39.41,  41.30],
-      ["Another talked about his teacher.",                           41.31,  44.00],
-      ["Then it was my turn.",                                        44.10,  45.50],
-      ["Hi everyone, I said.",                                        46.00,  48.00],
-      ["My name is Rose.",                                            48.02,  49.60],
-      ["This Women's Day, I want to say thank you to my mom.",        49.62,  54.60],
-      ["She is not famous.",                                          54.62,  57.00],
-      ["She is not rich.",                                            57.01,  58.30],
-      ["But she is the strongest woman I know.",                      58.40,  61.35],
-      ["She taught me to be kind.",                                   61.38,  64.00],
-      ["She taught me to keep learning.",                             64.01,  66.30],
-      ["And she always believes in me.",                              66.40,  68.25],
-      ["I paused for a second.",                                      68.30,  70.20],
-      ["And today, I also want to celebrate all the women here.",     70.30,  75.20],
-      ["Happy Women's Day.",                                          75.30,  77.30],
-      ["The room became quiet.",                                      77.40,  80.00],
-      ["Then people started clapping.",                               80.30,  82.00],
-      ["Not loud. But warm.",                                         82.25,  84.00],
-      ["One member said, that was wonderful.",                        84.01,  88.30],
-      ["I smiled.",                                                   88.40,  89.30],
-      ["Not nervous this time.",                                      89.40,  91.00],
-      ["On the way home, I thought about something again.",           91.10,  94.30],
-      ["Speaking English is not only about vocabulary.",              94.30,  98.50],
-      ["Sometimes, it's about speaking from the heart.",              99.00, 102.00]
+      "Story. A Small Speech for Women's Day.",
+      "A week later, I went back to the English club.",
+      "This time, I arrived early.",
+      "The room felt warm and friendly.",
+      "The club owner clapped her hands.",
+      "Alright everyone! Today's theme is Women's Day.",
+      "She smiled.",
+      "Each person will say a few sentences to celebrate a woman in their life.",
+      "Oh. A mini speech.",
+      "My heart was beating a little faster.",
+      "But not like last week.",
+      "I took a deep breath.",
+      "Again.",
+      "The first few members spoke.",
+      "One talked about her mother.",
+      "Another talked about his teacher.",
+      "Then it was my turn.",
+      "Hi everyone, I said.",
+      "My name is Rose.",
+      "This Women's Day, I want to say thank you to my mom.",
+      "She is not famous.",
+      "She is not rich.",
+      "But she is the strongest woman I know.",
+      "She taught me to be kind.",
+      "She taught me to keep learning.",
+      "And she always believes in me.",
+      "I paused for a second.",
+      "And today, I also want to celebrate all the women here.",
+      "Happy Women's Day.",
+      "The room became quiet.",
+      "Then people started clapping.",
+      "Not loud. But warm.",
+      "One member said, that was wonderful.",
+      "I smiled.",
+      "Not nervous this time.",
+      "On the way home, I thought about something again.",
+      "Speaking English is not only about vocabulary.",
+      "Sometimes, it's about speaking from the heart."
     ]
   },
   3: {
     id: 3,
     title: "Talking about Family",
     emoji: "👨‍👩‍👧‍👦",
-    youtubeUrl: "https://youtu.be/t8LQjuotcjY",
     sentences: [
-        ["Talking about Family.",                                                0.00,  2.03],
-    ["A week later, I went back to the English club.",                       2.70,  8.16],
-    ["This was my third time!",                                             8.80, 12.49],
-    ["When I opened the door, I saw many familiar faces.",                  13.03, 16.43],
-    ["Some people waved at me and said, 'Hi Rose!'",                       17.03, 20.00],
-    ["I gave them a big smile and waved back.",                             20.64, 22.64],
-    ["Then I found a seat and sat down.",                                   23.34, 28.84],
-    ["Soon, the club owner stood up and clapped her hands.",               29.53, 31.34],
-    ["Clap, clap, clap!",                                                  31.88, 34.65],
-    ["'Alright everyone!' she said.",                                       35.39, 37.24],
-    ["'Tonight, let's talk about our families.'",                           37.90, 42.00],
-    ["Everyone nodded and smiled.",                                         42.87, 44.74],
-    ["I liked this topic a lot.",                                           45.36, 49.46],
-    ["It made me feel warm inside.",                                        50.09, 53.80],
-    ["One man stood up and said,",                                          54.59, 56.80],
-    ["'My family is small.",                                                57.47, 59.46],
-    ["I live with my wife and my son.",                                     60.24, 63.08],
-    ["Every night, we eat dinner together and talk about our day.'",        64.13, 67.62],
-    ["Then the club owner looked at me.",                                   68.26, 72.04],
-    ["'Rose, would you like to share?'",                                    72.68, 76.63],
-    ["I stood up slowly and took a deep breath.",                           77.48, 81.46],
-    ["'Hi everyone! My name is Rose,' I said.",                             82.13, 86.16],
-    ["'My family isn't very big, but it is full of love.",                  86.79, 92.26],
-    ["I live with my mommy, my daddy, and my little sister.'",             92.98, 95.23],
-    ["'My mommy is lovely.",                                                95.99, 99.78],
-    ["She loves taking photos of us.'",                                    100.30, 104.70],
-    ["'My dad is quiet, but he takes very good care of our family.'",     105.28, 112.76],
-    ["'And my little sister?",                                             113.49, 115.82],
-    ["She is so funny! She always makes us giggle.'",                      116.58, 120.66],
-    ["I paused for a moment and continued.",                               121.27, 124.33],
-    ["'On weekends, we often visit my grandma and grandpa.",               124.91, 127.05],
-    ["We sit together, drink tea, and talk about many things.",            127.59, 130.74],
-    ["My grandma sometimes tells old family stories.",                     131.38, 134.61],
-    ["And my grandpa always asks,",                                        135.28, 137.85],
-    ["'Are you eating well?''",                                            138.71, 141.57],
-    ["Everyone in the room laughed softly.",                                142.09, 144.29],
-    ["Then I said,",                                                       144.86, 148.00],
-    ["'At night, our family has a little habit.",                           148.82, 149.28],
-    ["Before bed, we often read books together.",                          150.26, 153.53],
-    ["Sometimes we read quietly.",                                         154.09, 155.12],
-    ["Sometimes we share the funny parts of the story.",                   155.69, 157.50],
-    ["It's a simple moment, but I love it the most.'",                    158.10, 159.19],
-    ["I looked around the room and felt happy.",                           159.71, 162.17],
-    ["'For me, family is a safe place.",                                   162.88, 163.68],
-    ["It's a place where people listen to you.",                           164.44, 166.90],
-    ["And it's a place where love grows every day. Thank you!'",          167.62, 169.81],
-    ["When I sat down, the room was quiet for a moment. Then someone said, 'What a beautiful family!' Another person said, 'I want to read books with my family too!' I smiled.", 170.33, 177.71],
-    ["On the way home, I thought about it again. Families don't have to be perfect. Sometimes, it's just the little things — sharing a meal, telling a joke, or reading a story before bed. And maybe, those small moments are what make a family truly special.", 178.36, 184.03],
+      "Talking about Family.",
+      "A week later, I went back to the English club.",
+      "This was my third time!",
+      "When I opened the door, I saw many familiar faces.",
+      "Some people waved at me and said, 'Hi Rose!'",
+      "I gave them a big smile and waved back.",
+      "Then I found a seat and sat down.",
+      "Soon, the club owner stood up and clapped her hands.",
+      "Clap, clap, clap!",
+      "'Alright everyone!' she said.",
+      "'Tonight, let's talk about our families.'",
+      "Everyone nodded and smiled.",
+      "I liked this topic a lot.",
+      "It made me feel warm inside.",
+      "One man stood up and said,",
+      "'My family is small.",
+      "I live with my wife and my son.",
+      "Every night, we eat dinner together and talk about our day.'",
+      "Then the club owner looked at me.",
+      "'Rose, would you like to share?'",
+      "I stood up slowly and took a deep breath.",
+      "'Hi everyone! My name is Rose,' I said.",
+      "'My family isn't very big, but it is full of love.",
+      "I live with my mommy, my daddy, and my little sister.'",
+      "'My mommy is lovely.",
+      "She loves taking photos of us.'",
+      "'My dad is quiet, but he takes very good care of our family.'",
+      "'And my little sister?",
+      "She is so funny! She always makes us giggle.'",
+      "I paused for a moment and continued.",
+      "'On weekends, we often visit my grandma and grandpa.",
+      "We sit together, drink tea, and talk about many things.",
+      "My grandma sometimes tells old family stories.",
+      "And my grandpa always asks,",
+      "'Are you eating well?''",
+      "Everyone in the room laughed softly.",
+      "Then I said,",
+      "'At night, our family has a little habit.",
+      "Before bed, we often read books together.",
+      "Sometimes we read quietly.",
+      "Sometimes we share the funny parts of the story.",
+      "It's a simple moment, but I love it the most.'",
+      "I looked around the room and felt happy.",
+      "'For me, family is a safe place.",
+      "It's a place where people listen to you.",
+      "And it's a place where love grows every day. Thank you!'",
+      "When I sat down, the room was quiet for a moment. Then someone said, 'What a beautiful family!' Another person said, 'I want to read books with my family too!' I smiled.",
+      "On the way home, I thought about it again. Families don't have to be perfect. Sometimes, it's just the little things — sharing a meal, telling a joke, or reading a story before bed. And maybe, those small moments are what make a family truly special."
+    ]
   },
   4: {
     id: 4,
     title: "Inviting a Guest Home",
     emoji: "🏠",
-    youtubeUrl: "https://youtu.be/P-NXTmmdyD0",
     sentences: [
-      ["After the sharing time, the club owner smiled at me.",                               0.00,  4.40],
-      ["Rose, she said, your family sounds interesting.",                                    4.40,  9.24],
-      ["I felt a little shy, but I smiled.",                                                 9.24, 13.28],
-      ["Thank you!",                                                                        13.28, 14.62],
-      ["Then she asked, do you live near here?",                                            14.62, 18.82],
-      ["Yes, I said. My house is not very far from the club.",                              18.82, 24.40],
-      ["She laughed softly.",                                                               24.40, 26.42],
-      ["Really? I would love to see your home someday.",                                    26.42, 30.26],
-      ["I thought for a moment.",                                                           30.26, 32.56],
-      ["Then I said, why don't you visit my house this weekend?",                           32.56, 37.64],
-      ["Her eyes lit up.",                                                                  37.64, 40.00],
-      ["That sounds lovely!",                                                               40.00, 41.78],
-      ["On Saturday afternoon, she came to my house.",                                      41.78, 46.08],
-      ["When she arrived, I opened the door and waved.",                                    46.08, 50.02],
-      ["Welcome to my house!",                                                              50.02, 52.02],
-      ["She smiled and said, thank you for inviting me, Rose.",                             52.02, 56.88],
-      ["She looked at the building and said, oh, this house looks quite big.",              56.88, 63.14],
-      ["I nodded and explained, yes, my family lives here, but we also rent out some rooms.", 63.14, 71.14],
-      ["I began to introduce the house.",                                                   71.14, 74.28],
-      ["This is the first floor, I said. A small shop rents this space.",                   74.28, 80.60],
-      ["They sell clothes.",                                                                80.60, 82.28],
-      ["Then I continued. On the upper floors there are several rooms.",                    82.28, 89.82],
-      ["Some students rent rooms here and some small families live here too.",              89.82, 96.00],
-      ["Then I said, come, let me show you where my family lives.",                         96.00, 103.50],
-      ["We walked upstairs.",                                                              103.50, 106.00],
-      ["This is our living room, I explained.",                                            106.00, 110.44],
-      ["In the evening, my parents, my sister, and I often sit here and talk.",            110.44, 116.00],
-      ["Then I pointed to another room. This is our kitchen.",                             116.00, 121.00],
-      ["My mom cooks many delicious meals here.",                                          121.00, 127.66],
-      ["Over there is our bathroom. It's small, but we always keep it clean.",             127.66, 132.00],
-      ["And we have two bedrooms. They are small, but very cozy.",                         132.00, 136.00],
-      ["Near the window, there was a small table with some books.",                        136.00, 140.00],
-      ["This is my favorite place, I said. I like to sit here and read.",                  140.00, 144.74],
-      ["The club owner smiled warmly.",                                                    144.74, 148.00],
-      ["That sounds like a very peaceful moment.",                                         148.00, 153.16],
-      ["After the tour, we sat in the living room and drank some tea.",                    153.16, 158.50],
-      ["The club owner said, Rose, you introduced your house very clearly in English.",    158.50, 163.50],
-      ["I laughed a little.",                                                              163.50, 165.50],
-      ["I'm still learning, I said, but I like practicing English with real-life things.", 165.50, 168.74],
-      ["She nodded. That's the best way to learn.",                                        168.74, 177.40],
-      ["Then she said, next week at the club, maybe everyone can talk about their houses.", 177.40, 183.80],
-      ["My eyes lit up. That sounds fun!",                                                 183.80, 186.18],
-      ["And suddenly I realized something.",                                               186.18, 189.00],
-      ["Sometimes, the best English lesson is simply sharing your life, your home, and your stories with others.", 189.00, 195.54],
+      "After the sharing time, the club owner smiled at me.",
+      "Rose, she said, your family sounds interesting.",
+      "I felt a little shy, but I smiled.",
+      "Thank you!",
+      "Then she asked, do you live near here?",
+      "Yes, I said. My house is not very far from the club.",
+      "She laughed softly.",
+      "Really? I would love to see your home someday.",
+      "I thought for a moment.",
+      "Then I said, why don't you visit my house this weekend?",
+      "Her eyes lit up.",
+      "That sounds lovely!",
+      "On Saturday afternoon, she came to my house.",
+      "When she arrived, I opened the door and waved.",
+      "Welcome to my house!",
+      "She smiled and said, thank you for inviting me, Rose.",
+      "She looked at the building and said, oh, this house looks quite big.",
+      "I nodded and explained, yes, my family lives here, but we also rent out some rooms.",
+      "I began to introduce the house.",
+      "This is the first floor, I said. A small shop rents this space.",
+      "They sell clothes.",
+      "Then I continued. On the upper floors there are several rooms.",
+      "Some students rent rooms here and some small families live here too.",
+      "Then I said, come, let me show you where my family lives.",
+      "We walked upstairs.",
+      "This is our living room, I explained.",
+      "In the evening, my parents, my sister, and I often sit here and talk.",
+      "Then I pointed to another room. This is our kitchen.",
+      "My mom cooks many delicious meals here.",
+      "Over there is our bathroom. It's small, but we always keep it clean.",
+      "And we have two bedrooms. They are small, but very cozy.",
+      "Near the window, there was a small table with some books.",
+      "This is my favorite place, I said. I like to sit here and read.",
+      "The club owner smiled warmly.",
+      "That sounds like a very peaceful moment.",
+      "After the tour, we sat in the living room and drank some tea.",
+      "The club owner said, Rose, you introduced your house very clearly in English.",
+      "I laughed a little.",
+      "I'm still learning, I said, but I like practicing English with real-life things.",
+      "She nodded. That's the best way to learn.",
+      "Then she said, next week at the club, maybe everyone can talk about their houses.",
+      "My eyes lit up. That sounds fun!",
+      "And suddenly I realized something.",
+      "Sometimes, the best English lesson is simply sharing your life, your home, and your stories with others."
     ]
   },
   5: {
     id: 5,
     title: "Back Again!",
     emoji: "🔄",
-    youtubeUrl: "https://youtu.be/XvwHq2NEHgE",
     sentences: [
-      ["Story. Back Again.",                                                               0.00,  0.91],
-      ["One week.",                                                                        1.28,  3.46],
-      ["That's how long I had been away from the club.",                                   4.12,  6.23],
-      ["I pushed open the door and stepped inside.",                                       6.70,  8.39],
-      ["A few people looked up and smiled.",                                               8.76,  9.38],
-      ["Someone said, Rose! You're back!",                                                 9.83, 11.09],
-      ["I gave a little wave.",                                                           11.66, 12.53],
-      ["Sorry for disappearing, I said.",                                                 13.22, 14.95],
-      ["Some family stuff came up.",                                                      15.23, 16.52],
-      ["The club owner nodded warmly.",                                                   17.08, 18.71],
-      ["We missed you. Glad you're here tonight.",                                        19.01, 20.90],
-      ["That small welcome.",                                                             21.67, 23.08],
-      ["It meant more than I expected.",                                                  23.60, 25.21],
-      ["She clapped her hands.",                                                          25.80, 26.68],
-      ["Alright, everyone.",                                                              27.04, 29.60],
-      ["Tonight's topic is: How do you keep English in your daily life?",                 30.00, 32.32],
-      ["Not just study. Just... life.",                                                   32.82, 34.19],
-      ["Interesting.",                                                                    34.74, 35.12],
-      ["I had been thinking about this lately.",                                          35.94, 36.59],
-      ["One member said,",                                                                37.13, 38.69],
-      ["I switched my phone to English.",                                                 39.36, 40.30],
-      ["It feels small, but I pick up new words without even trying.",                    40.75, 42.65],
-      ["Another said, I talk to myself in English on the way to work.",                   42.96, 46.29],
-      ["I just describe what I see.",                                                     46.92, 47.73],
-      ["A few people laughed quietly.",                                                   48.31, 50.40],
-      ["Honestly, same, someone admitted.",                                               50.71, 52.17],
-      ["Then it was my turn.",                                                            52.87, 54.62],
-      ["Last week, I barely used English at all, I said.",                                55.04, 57.26],
-      ["I was busy. I kept telling myself, I'll do it tomorrow.",                         57.85, 60.51],
-      ["I paused.",                                                                       60.81, 63.06],
-      ["But tomorrow kept moving further away.",                                          63.64, 64.30],
-      ["I looked around the room.",                                                       64.61, 67.16],
-      ["Coming here, showing up every week, that's my habit.",                            67.81, 68.35],
-      ["Not perfect. I missed one week.",                                                 69.15, 71.54],
-      ["But I don't want to quit.",                                                       72.17, 73.08],
-      ["I just want to keep showing up.",                                                 73.83, 75.91],
-      ["The room was quiet for a moment.",                                                76.29, 77.35],
-      ["The club owner smiled.",                                                          77.87, 79.71],
-      ["A habit is something you build every day.",                                       80.22, 81.44],
-      ["But missing a few days doesn't erase it.",                                        81.86, 83.60],
-      ["You just pick it up again, no guilt, no drama.",                                  84.47, 86.12],
-      ["On the way home, I turned that over in my mind.",                                 86.71, 87.78],
-      ["A habit isn't ruined by a bad week.",                                             88.53, 90.85],
-      ["It's ruined by deciding not to go back.",                                         91.36, 93.51],
-      ["Tonight, I went back.",                                                           94.01, 96.81],
-      ["And that felt like enough.",                                                      97.85, 100.55],
+      "Story. Back Again.",
+      "One week.",
+      "That's how long I had been away from the club.",
+      "I pushed open the door and stepped inside.",
+      "A few people looked up and smiled.",
+      "Someone said, Rose! You're back!",
+      "I gave a little wave.",
+      "Sorry for disappearing, I said.",
+      "Some family stuff came up.",
+      "The club owner nodded warmly.",
+      "We missed you. Glad you're here tonight.",
+      "That small welcome.",
+      "It meant more than I expected.",
+      "She clapped her hands.",
+      "Alright, everyone.",
+      "Tonight's topic is: How do you keep English in your daily life?",
+      "Not just study. Just... life.",
+      "Interesting.",
+      "I had been thinking about this lately.",
+      "One member said,",
+      "I switched my phone to English.",
+      "It feels small, but I pick up new words without even trying.",
+      "Another said, I talk to myself in English on the way to work.",
+      "I just describe what I see.",
+      "A few people laughed quietly.",
+      "Honestly, same, someone admitted.",
+      "Then it was my turn.",
+      "Last week, I barely used English at all, I said.",
+      "I was busy. I kept telling myself, I'll do it tomorrow.",
+      "I paused.",
+      "But tomorrow kept moving further away.",
+      "I looked around the room.",
+      "Coming here, showing up every week, that's my habit.",
+      "Not perfect. I missed one week.",
+      "But I don't want to quit.",
+      "I just want to keep showing up.",
+      "The room was quiet for a moment.",
+      "The club owner smiled.",
+      "A habit is something you build every day.",
+      "But missing a few days doesn't erase it.",
+      "You just pick it up again, no guilt, no drama.",
+      "On the way home, I turned that over in my mind.",
+      "A habit isn't ruined by a bad week.",
+      "It's ruined by deciding not to go back.",
+      "Tonight, I went back.",
+      "And that felt like enough."
     ]
   },
   6: {
     id: 6,
     title: "A day at the Beach",
     emoji: "🏖️",
-    youtubeUrl: "https://youtu.be/lTwPj-2U53E",
     sentences: [
-      ["It was a beautiful Sunday afternoon.",                                             0.26,  3.51],
-      ["I went to the beach with my parents and my little sister.",                        4.05,  7.71],
-      ["The sun was shining, and the waves sounded so relaxing.",                          8.16,  9.73],
-      ["While my family was playing together on the sand,",                               10.00, 12.78],
-      ["I noticed a tourist nearby.",                                                     13.51, 16.88],
-      ["She was helping her little boy build a sandcastle.",                               17.22, 19.46],
-      ["I remembered the club owner's words from last week.",                              19.95, 23.74],
-      ["Make English a daily habit.",                                                      24.48, 28.13],
-      ["I took a deep breath and walked over.",                                            28.62, 31.14],
-      ["Time to practice.",                                                               31.73, 33.08],
-      ["Hi there! That is a very impressive sandcastle.",                                 33.48, 34.56],
-      ["The woman looked up from the sand and smiled warmly.",                             35.08, 36.54],
-      ["Oh, thank you!",                                                                  37.22, 37.88],
-      ["He's been working on it all afternoon.",                                           38.34, 41.47],
-      ["I'm Sarah, by the way.",                                                          42.12, 46.15],
-      ["Nice to meet you, Sarah. I'm Rose.",                                              46.68, 51.60],
-      ["He looks like he's having a great time.",                                         52.15, 53.44],
-      ["He really is.",                                                                   53.84, 54.76],
-      ["The beach here is amazing.",                                                      55.23, 57.76],
-      ["I wanted to keep the conversation going, so I asked a simple question.",          58.29, 61.34],
-      ["Are you visiting Da Nang for a holiday?",                                         62.03, 64.88],
-      ["Yes, we are! We're visiting from New Zealand.",                                   65.19, 67.45],
-      ["It's our first time in Vietnam.",                                                 68.06, 70.62],
-      ["Welcome! How are you liking it so far?",                                          71.19, 75.83],
-      ["We love it.",                                                                     76.38, 77.08],
-      ["The food is delicious, and everyone is so friendly.",                             77.47, 79.31],
-      ["What about you? Do you live here?",                                               79.83, 84.91],
-      ["Yes, I was born here.",                                                           85.18, 86.87],
-      ["I'm actually here with my family today.",                                         87.54, 89.26],
-      ["My little sister is just over there, playing in the sand.",                       89.72, 92.26],
-      ["That sounds like fun!",                                                           92.73, 96.63],
-      ["It's so nice to spend a Sunday with family.",                                     97.21, 98.51],
-      ["It really is.",                                                                   99.10, 103.25],
-      ["We chatted for a few more minutes about local seafood.",                          103.88, 104.96],
-      ["When I said goodbye, I felt a warm sense of pride.",                              105.56, 109.55],
-      ["On my way back to my family, I realized something.",                              110.06, 114.14],
-      ["Starting a conversation isn't as scary as I thought.",                            114.85, 116.85],
-      ["And keeping it going?",                                                           117.25, 118.61],
-      ["You just need to show a little interest in the other person.",                    119.05, 123.22],
-      ["Sometimes, a simple question can open the door to a great chat.",                 123.52, 129.26],
+      "It was a beautiful Sunday afternoon.",
+      "I went to the beach with my parents and my little sister.",
+      "The sun was shining, and the waves sounded so relaxing.",
+      "While my family was playing together on the sand,",
+      "I noticed a tourist nearby.",
+      "She was helping her little boy build a sandcastle.",
+      "I remembered the club owner's words from last week.",
+      "Make English a daily habit.",
+      "I took a deep breath and walked over.",
+      "Time to practice.",
+      "Hi there! That is a very impressive sandcastle.",
+      "The woman looked up from the sand and smiled warmly.",
+      "Oh, thank you!",
+      "He's been working on it all afternoon.",
+      "I'm Sarah, by the way.",
+      "Nice to meet you, Sarah. I'm Rose.",
+      "He looks like he's having a great time.",
+      "He really is.",
+      "The beach here is amazing.",
+      "I wanted to keep the conversation going, so I asked a simple question.",
+      "Are you visiting Da Nang for a holiday?",
+      "Yes, we are! We're visiting from New Zealand.",
+      "It's our first time in Vietnam.",
+      "Welcome! How are you liking it so far?",
+      "We love it.",
+      "The food is delicious, and everyone is so friendly.",
+      "What about you? Do you live here?",
+      "Yes, I was born here.",
+      "I'm actually here with my family today.",
+      "My little sister is just over there, playing in the sand.",
+      "That sounds like fun!",
+      "It's so nice to spend a Sunday with family.",
+      "It really is.",
+      "We chatted for a few more minutes about local seafood.",
+      "When I said goodbye, I felt a warm sense of pride.",
+      "On my way back to my family, I realized something.",
+      "Starting a conversation isn't as scary as I thought.",
+      "And keeping it going?",
+      "You just need to show a little interest in the other person.",
+      "Sometimes, a simple question can open the door to a great chat."
     ]
   },
-   7: {
+  7: {
     id: 7,
     title: "A day at the market",
     emoji: "🛒",
-    youtubeUrl: "https://youtu.be/s7ZsxT-6CWk",
     sentences: [
-      ["A few days later, my mom sent me to Con Market to buy some fruit.",                  0.00,  4.20],
-      ["It was crowded and noisy, as usual.",                                                4.20,  6.80],
-      ["I saw Sarah and her family at a food stall.",                                        6.80,  9.60],
-      ["Her family was busy eating, but Sarah was standing aside, looking at the snack stalls with a bit of hesitation.", 9.60, 14.80],
-      ["Rose: Sarah? Hi! What a surprise!",                                                 14.80, 17.40],
-      ["Sarah: Oh, Rose! Hi! What a small world! It's so good to see you again.",            17.40, 22.00],
-      ["Rose: Good to see you too! How's it going? The market is pretty crazy today, huh?", 22.00, 27.20],
-      ["Sarah: Yeah, it's a bit much!",                                                     27.20, 29.80],
-      ["But my family is over there—they're having a great time trying the local food.",     29.80, 33.80],
-      ["I want to buy some snacks to take home, but everything looks great, and there are so many options!", 33.80, 38.80],
-      ["I'm not sure which one is the best.",                                               38.80, 41.60],
-      ["Rose: I totally understand.",                                                       41.60, 43.40],
-      ["Well, these are Anatta soft-dried bananas.",                                        43.40, 46.20],
-      ["They're a local favorite—really sweet and healthy.",                                46.20, 49.20],
-      ["I buy them all the time.",                                                          49.20, 51.40],
-      ["Sarah: Oh, they look good!",                                                        51.40, 53.40],
-      ["But I don't see any price tags.",                                                   53.40, 56.20],
-      ["Should I just hand her some cash and hope for the best?",                            56.20, 60.20],
-      ["Rose: In local markets, it's better to ask first.",                                 60.20, 64.20],
-      ["You might even get a better deal if you buy a few packs.",                          64.20, 68.40],
-      ["Do you want to try asking in Vietnamese?",                                          68.40, 71.40],
-      ["Sarah: I'd love to, but I don't know how!",                                        71.40, 74.60],
-      ["Rose: It's easy.",                                                                  74.60, 76.20],
-      ["Just say: Bao nhiêu tiền?",                                                         76.20, 79.40],
-      ["Sarah: Bao... nhiêu... tiền? Did I get that right?",                               79.40, 83.80],
-      ["Rose: Perfect!",                                                                    83.80, 85.40],
-      ["Go ahead, I'm right here if you need me.",                                         85.40, 88.60],
-      ["Sarah: That was actually fun!",                                                    88.60, 90.80],
-      ["Thanks, Rose.",                                                                     90.80, 92.40],
-      ["I'm so glad I ran into you.",                                                      92.40, 95.00],
-      ["Rose: Me too. I'm just happy I could help.",                                       95.00, 98.00],
-      ["I helped Sarah pick out her gifts, and we swapped numbers.",                        98.00, 102.20],
-      ["On the way home, I realized something simple: Speaking a language isn't just about grammar.", 102.20, 107.60],
-      ["It's about showing up, helping out, and making a connection.",                     107.60, 114.00],
+      "A few days later, my mom sent me to Con Market to buy some fruit.",
+      "It was crowded and noisy, as usual.",
+      "I saw Sarah and her family at a food stall.",
+      "Her family was busy eating, but Sarah was standing aside, looking at the snack stalls with a bit of hesitation.",
+      "Speaker 1: Sarah? Hi! What a surprise!",
+      "Speaker 2: Oh, Rose! Hi! What a small world! It's so good to see you again.",
+      "Speaker 1: Good to see you too! How's it going? The market is pretty crazy today, huh?",
+      "Speaker 2: Yeah, it's a bit much!",
+      "But my family is over there—they're having a great time trying the local food.",
+      "I want to buy some snacks to take home, but everything looks great, and there are so many options!",
+      "I'm not sure which one is the best.",
+      "Speaker 1: I totally understand.",
+      "Well, these are Anatta soft-dried bananas.",
+      "They're a local favorite—really sweet and healthy.",
+      "I buy them all the time.",
+      "Speaker 2: Oh, they look good!",
+      "But I don't see any price tags.",
+      "Should I just hand her some cash and hope for the best?",
+      "Speaker 1: In local markets, it's better to ask first.",
+      "You might even get a better deal if you buy a few packs.",
+      "Do you want to try asking in Vietnamese?",
+      "Speaker 2: I'd love to, but I don't know how!",
+      "Speaker 1: It's easy.",
+      "Just say: Bao nhiêu tiền?",
+      "Speaker 2: Bao... nhiêu... tiền? Did I get that right?",
+      "Speaker 1: Perfect!",
+      "Go ahead, I'm right here if you need me.",
+      "Speaker 2: That was actually fun!",
+      "Thanks, Rose.",
+      "I'm so glad I ran into you.",
+      "Speaker 1: Me too. I'm just happy I could help.",
+      "I helped Sarah pick out her gifts, and we swapped numbers.",
+      "On the way home, I realized something simple: Speaking a language isn't just about grammar.",
+      "It's about showing up, helping out, and making a connection."
     ]
   }
 };
+
+const LessonReader = () => {
+  const [currentId, setCurrentId] = useState(1);
+  const [playingIdx, setPlayingIdx] = useState(-1);
+  const [selectedVoice, setSelectedVoice] = useState(null);
+  const synth = useRef(window.speechSynthesis);
+  
+  const lesson = LESSONS_DATA[currentId];
+
+  // 1. Tự động tìm giọng Mỹ chất lượng cao khi load ứng dụng
+  useEffect(() => {
+    const initVoices = () => {
+      const voices = synth.current.getVoices();
+      const bestVoice = 
+        voices.find(v => v.name === 'Google US English') ||
+        voices.find(v => v.name.includes('Samantha') && v.lang === 'en-US') ||
+        voices.find(v => (v.name.includes('Aria') || v.name.includes('Guy')) && v.lang === 'en-US') ||
+        voices.find(v => v.lang === 'en-US') ||
+        voices[0];
+      setSelectedVoice(bestVoice);
+    };
+
+    if (synth.current.onvoiceschanged !== undefined) {
+      synth.current.onvoiceschanged = initVoices;
+    }
+    initVoices();
+
+    return () => synth.current.cancel();
+  }, []);
+
+  // 2. Hàm dọn dẹp văn bản trước khi đọc (loại bỏ Speaker 1, Rose, ...)
+  const cleanText = (text) => text.replace(/^(Speaker \d+|Rose|Sarah): /i, '');
+
+  // 3. Đọc 1 câu đơn lẻ (Shadowing mode)
+  const speakOne = (text, index) => {
+    synth.current.cancel();
+    const utter = new SpeechSynthesisUtterance(cleanText(text));
+    if (selectedVoice) utter.voice = selectedVoice;
+    
+    utter.rate = 0.9; // Tốc độ 0.9 giúp học viên nghe rõ hơn
+    utter.onstart = () => setPlayingIdx(index);
+    utter.onend = () => setPlayingIdx(-1);
+    
+    synth.current.speak(utter);
+  };
+
+  // 4. Đọc toàn bài học
+  const speakAll = (startIdx = 0) => {
+    synth.current.cancel();
+    let idx = startIdx;
+
+    const playNext = () => {
+      if (idx >= lesson.sentences.length) {
+        setPlayingIdx(-1);
+        return;
+      }
+      const utter = new SpeechSynthesisUtterance(cleanText(lesson.sentences[idx]));
+      if (selectedVoice) utter.voice = selectedVoice;
+      utter.rate = 0.9;
+      utter.onstart = () => setPlayingIdx(idx);
+      utter.onend = () => {
+        idx++;
+        playNext();
+      };
+      synth.current.speak(utter);
+    };
+    playNext();
+  };
+
+  const stop = () => {
+    synth.current.cancel();
+    setPlayingIdx(-1);
+  };
+
+  return (
+    <div style={{ maxWidth: '800px', margin: '40px auto', padding: '20px', fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif', color: '#334155' }}>
+      
+      {/* HEADER & SELECTOR */}
+      <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '16px', marginBottom: '30px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: '24px', color: '#1e293b' }}>{lesson.emoji} {lesson.title}</h1>
+            <p style={{ margin: '5px 0 0', color: '#64748b', fontSize: '14px' }}>Học tiếng Anh qua câu chuyện của Be A Gift</p>
+          </div>
+          <select 
+            value={currentId} 
+            onChange={(e) => { stop(); setCurrentId(Number(e.target.value)); }}
+            style={{ padding: '10px 15px', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none', cursor: 'pointer', background: 'white' }}
+          >
+            {Object.values(LESSONS_DATA).map(ls => (
+              <option key={ls.id} value={ls.id}>Bài {ls.id}: {ls.title}</option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+          <button onClick={() => speakAll(0)} style={{ flex: 1, padding: '12px', borderRadius: '10px', border: 'none', background: '#0ea5e9', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>▶ Đọc toàn bài</button>
+          <button onClick={stop} style={{ flex: 1, padding: '12px', borderRadius: '10px', border: 'none', background: '#ef4444', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>⏹ Dừng lại</button>
+        </div>
+      </div>
+
+      {/* LIST SENTENCES */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {lesson.sentences.map((text, i) => (
+          <div 
+            key={i} 
+            onClick={() => speakOne(text, i)}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '15px', 
+              padding: '16px', 
+              borderRadius: '12px', 
+              cursor: 'pointer',
+              transition: '0.2s',
+              backgroundColor: playingIdx === i ? '#f0f9ff' : 'white',
+              border: playingIdx === i ? '1px solid #0ea5e9' : '1px solid #f1f5f9',
+              boxShadow: playingIdx === i ? '0 4px 12px rgba(14, 165, 233, 0.1)' : 'none'
+            }}
+          >
+            <div style={{ color: playingIdx === i ? '#0ea5e9' : '#94a3b8', fontSize: '20px' }}>
+              {playingIdx === i ? '🔊' : '🔈'}
+            </div>
+            <span style={{ fontSize: '18px', lineHeight: '1.6', color: playingIdx === i ? '#0369a1' : '#334155' }}>
+              {text}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <footer style={{ marginTop: '40px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>
+        Thiết bị đang sử dụng giọng đọc: {selectedVoice?.name || 'Đang tải...'}
+      </footer>
+    </div>
+  );
+};
+
+export default LessonReader;
