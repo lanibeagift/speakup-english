@@ -397,7 +397,7 @@ const LESSONS_DATA = {
       "The photos of the rice fields look amazing!",
       "Do you have any tips for us?",
       "That’s a perfect choice, Sarah!",
-      "Since you’re staying in Cam Thanh, you should wake up early—around 6 AM.",
+      "Since you’re staying in Hoi An, you should wake up early—around 6 AM.",
       "The air over the rice fields is so fresh, it’s the best time for a mindful walk.",
       "6 AM?",
       "That sounds early, but I'll try!",
