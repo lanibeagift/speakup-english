@@ -385,7 +385,7 @@ const LESSONS_DATA = {
       "Now, let’s soak in this afternoon breeze.",
       "I realized that the best gift you can give someone isn't something you buy—it's your time, your culture, and a moment of true connection."
     ]
-  }
+  },
   9: {
     id: 9,
     title: "Local Tips for Hoi An",
