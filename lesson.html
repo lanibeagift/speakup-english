@@ -140,7 +140,9 @@ textarea::placeholder{color:var(--text3)}
 </head>
 <body>
 
-<audio id="audio" preload="auto"></audio>
+<div style="position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none;">
+  <div id="youtube-player"></div>
+</div>
 
 <nav>
   <button class="btn-back" onclick="goBack()">← Back</button>
