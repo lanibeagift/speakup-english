@@ -241,7 +241,9 @@ textarea::placeholder{color:var(--text3)}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script src="lessons.js"></script>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyD4F3w5bZWqixn_d2R1TjrucRLcAi0GAfA",
@@ -315,7 +317,6 @@ function createPlayer() {
         document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
       },
       'onStateChange': (event) => {
-        // Trạng thái 0 nghĩa là video đã kết thúc (Ended)
         if (event.data === 0 && isFullPlaying) {
           isFullPlaying = false;
           document.getElementById('wave').classList.remove('on');
@@ -347,7 +348,7 @@ auth.onAuthStateChanged(user => {
   pill.className = 'mode-pill ' + mode;
   document.getElementById('prog-num').innerHTML = `1 <small>/ ${SENTENCES.length}</small>`;
 
-  // Khởi tạo YouTube Player
+  // Khởi tạo YouTube Player (Đã xóa toàn bộ phần code liên quan đến thẻ audio cũ)
   initYouTube();
 
   render();
