@@ -1,3 +1,10 @@
+Chào bạn, phần HTML (giao diện) bạn sửa đã **rất chính xác** rồi (bạn đã thay thẻ `<audio>` bằng thẻ `<div>` chứa YouTube). 
+
+Tuy nhiên, phần **JavaScript (code logic ở cuối file)** của bạn thì **vẫn đang là code cũ dùng cho thẻ `<audio>`**. Nếu bạn chạy file này, nó sẽ báo lỗi ngay lập tức vì không tìm thấy thẻ `audio` nào để phát cả.
+
+Mình đã gom toàn bộ code YouTube API (mà mình hướng dẫn ở bước trước) và tích hợp hoàn chỉnh vào file của bạn. Bạn chỉ cần **copy toàn bộ nội dung dưới đây và ghi đè (thay thế hoàn toàn)** vào file `practice.html` hiện tại của bạn là hệ thống sẽ chạy mượt mà với YouTube nhé:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -266,25 +273,76 @@ let idx = 0, correct = 0, wrong = 0, hintLevel = 0, answered = false;
 let audioSpeed = 1.0, autoRepeat = true, isPlaying = false, stopTimer = null, audioLoaded = false;
 let scriptVisible = true, recog = null, isRec = false;
 let sessionStart = Date.now();
+let player; // Biến lưu trữ YouTube Player
 
-const audio = document.getElementById('audio');
+// ── YouTube API ─────────────────────────────────────────
+function getYouTubeId(url) {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+}
+
+function initYouTube() {
+  if (window.YT && window.YT.Player) {
+    createPlayer();
+  } else {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    window.onYouTubeIframeAPIReady = createPlayer;
+  }
+}
+
+function createPlayer() {
+  const videoUrl = lesson.youtubeUrl; 
+  const videoId = getYouTubeId(videoUrl);
+
+  if (!videoId) {
+    document.getElementById('p-sub').textContent = '⚠️ Link YouTube không hợp lệ';
+    return;
+  }
+
+  player = new YT.Player('youtube-player', {
+    height: '1',
+    width: '1',
+    videoId: videoId,
+    playerVars: {
+      'autoplay': 0,
+      'controls': 0,
+      'disablekb': 1,
+      'playsinline': 1,
+      'rel': 0
+    },
+    events: {
+      'onReady': () => {
+        audioLoaded = true;
+        document.getElementById('play-btn').disabled = false;
+        document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
+      },
+      'onStateChange': (event) => {
+        // Trạng thái 0 nghĩa là video đã kết thúc (Ended)
+        if (event.data === 0 && isFullPlaying) {
+          isFullPlaying = false;
+          document.getElementById('wave').classList.remove('on');
+          document.getElementById('full-btn').textContent = '🎧 Full story';
+          document.getElementById('full-btn').classList.remove('playing');
+          document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
+        }
+      },
+      'onError': () => {
+        document.getElementById('p-sub').textContent = '⚠️ Lỗi tải video YouTube';
+      }
+    }
+  });
+}
 
 // ── Auth ───────────────────────────────────────────────
 auth.onAuthStateChanged(user => {
   if (!user) { window.location.href = 'index.html'; return; }
   if (!lesson) { window.location.href = 'dashboard.html'; return; }
   currentUser = user;
-
-  // Set audio src
-  audio.src = lesson.audio;
-  audio.oncanplay = () => {
-    audioLoaded = true;
-    document.getElementById('play-btn').disabled = false;
-    document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
-  };
-  audio.onerror = () => {
-    document.getElementById('p-sub').textContent = '⚠️ Audio file not found';
-  };
 
   // Init UI
   document.getElementById('nav-title').textContent = lesson.title;
@@ -296,23 +354,30 @@ auth.onAuthStateChanged(user => {
   pill.className = 'mode-pill ' + mode;
   document.getElementById('prog-num').innerHTML = `1 <small>/ ${SENTENCES.length}</small>`;
 
+  // Khởi tạo YouTube Player
+  initYouTube();
+
   render();
 });
 
-// ── Audio ──────────────────────────────────────────────
+// ── Audio Controls (YouTube) ───────────────────────────
 function playCurrent() {
-  if (!audioLoaded) { document.getElementById('p-sub').textContent = '⏳ Loading audio…'; return; }
+  if (!audioLoaded || !player) { document.getElementById('p-sub').textContent = '⏳ Loading audio…'; return; }
   if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
+  
   const [, start, end] = SENTENCES[idx];
   const duration = (end - start) / audioSpeed;
-  audio.playbackRate = audioSpeed;
-  audio.currentTime = start;
-  audio.play();
+  
+  player.setPlaybackRate(audioSpeed);
+  player.seekTo(start, true);
+  player.playVideo();
+  
   isPlaying = true;
   document.getElementById('wave').classList.add('on');
   document.getElementById('play-btn').textContent = '◼ Stop';
   document.getElementById('play-btn').onclick = stopAudio;
   document.getElementById('p-sub').textContent = `🔊 Playing sentence ${idx + 1}…`;
+  
   stopTimer = setTimeout(() => {
     stopAudio();
     if (autoRepeat) stopTimer = setTimeout(playCurrent, 700);
@@ -321,7 +386,9 @@ function playCurrent() {
 
 function stopAudio() {
   if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
-  audio.pause();
+  if (player && typeof player.pauseVideo === 'function') {
+    player.pauseVideo();
+  }
   isPlaying = false;
   isFullPlaying = false;
   document.getElementById('wave').classList.remove('on');
@@ -332,42 +399,25 @@ function stopAudio() {
   document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
 }
 
-// ── Full story playback ────────────────────────────────
 let isFullPlaying = false;
-
 function toggleFullStory() {
-  if (!audioLoaded) return;
+  if (!audioLoaded || !player) return;
   if (isFullPlaying) {
     stopAudio();
     return;
   }
-  // Stop any sentence playback
+  
   if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
-  audio.pause();
-  isPlaying = false;
-  document.getElementById('play-btn').textContent = '▶ Play';
-  document.getElementById('play-btn').onclick = playCurrent;
-
-  // Play from start
+  
   isFullPlaying = true;
-  audio.playbackRate = audioSpeed;
-  audio.currentTime = 0;
-  audio.play();
+  player.setPlaybackRate(audioSpeed);
+  player.seekTo(0, true);
+  player.playVideo();
 
   document.getElementById('wave').classList.add('on');
   document.getElementById('full-btn').textContent = '⏹ Stop';
   document.getElementById('full-btn').classList.add('playing');
   document.getElementById('p-sub').textContent = '🎧 Playing full story…';
-
-  // When full audio ends naturally
-  audio.onended = () => {
-    isFullPlaying = false;
-    document.getElementById('wave').classList.remove('on');
-    document.getElementById('full-btn').textContent = '🎧 Full story';
-    document.getElementById('full-btn').classList.remove('playing');
-    document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
-    audio.onended = null;
-  };
 }
 
 function toggleRepeat() {
@@ -379,6 +429,11 @@ function setSpeed(s, el) {
   audioSpeed = s;
   document.querySelectorAll('.spd').forEach(b => b.classList.remove('on'));
   el.classList.add('on');
+  
+  if (player && typeof player.setPlaybackRate === 'function') {
+    player.setPlaybackRate(s);
+  }
+  
   if (isPlaying) { stopAudio(); setTimeout(playCurrent, 200); }
 }
 
@@ -418,18 +473,14 @@ function render() {
     if (isRec) stopRec();
   }
 
-  // No auto-play — user presses ▶ Play manually
   if (mode === 'dictation') {
     setTimeout(() => document.getElementById('t-in').focus(), 60);
   }
 }
 
 // ── Dictation ──────────────────────────────────────────
-
-// Thêm hàm để quy đổi các từ viết tắt phổ biến về dạng đầy đủ
 function expandContractions(str) {
   let s = str.toLowerCase();
-  
   s = s.replace(/i['’]m/g, "i am");
   s = s.replace(/can['’]t/g, "cannot");
   s = s.replace(/won['’]t/g, "will not");
@@ -446,14 +497,13 @@ function expandContractions(str) {
   s = s.replace(/['’]ll/g, " will");
   s = s.replace(/['’]ve/g, " have");
   s = s.replace(/['’]d/g, " would");
-
   return s;
 }
 
 function norm(s) {
   return expandContractions(s)
-    .replace(/[.,!?;:"""—–\-]/g, '')  // Xóa toàn bộ dấu câu
-    .replace(/\s+/g, ' ').trim();     // Chuẩn hóa khoảng trắng thừa
+    .replace(/[.,!?;:"""—–\-]/g, '')
+    .replace(/\s+/g, ' ').trim();
 }
 
 function doHint() {
@@ -625,14 +675,12 @@ async function showComplete() {
       if (!studyDates.includes(today)) studyDates.push(today);
       studyDates = studyDates.slice(-30);
 
-      // Safely read existing nested objects
       const existingProgress = data.progress || {};
       const existingUnlocked = data.unlocked || {};
 
       existingProgress[`${topicId}_${mode}`] = accuracy;
       if (passed) existingUnlocked[`topic${topicId}`] = true;
 
-      // Use set+merge to avoid "field missing" errors
       await userRef.set({
         name: data.name || currentUser.displayName,
         email: data.email || currentUser.email,
@@ -646,7 +694,6 @@ async function showComplete() {
         unlocked: existingUnlocked,
       }, { merge: true });
 
-      // Add session record
       await userRef.collection('sessions').add({
         topicId, mode,
         date: new Date().toISOString(),
@@ -675,3 +722,4 @@ function restart() {
 </script>
 </body>
 </html>
+```
