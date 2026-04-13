@@ -140,10 +140,6 @@ textarea::placeholder{color:var(--text3)}
 </head>
 <body>
 
-<div style="position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none;">
-  <div id="youtube-player"></div>
-</div>
-
 <nav>
   <button class="btn-back" onclick="goBack()">← Back</button>
   <div class="nav-center">
@@ -159,7 +155,7 @@ textarea::placeholder{color:var(--text3)}
       <div class="p-icon" id="p-icon">🔊</div>
       <div>
         <div class="p-title" id="p-title">...</div>
-        <div class="p-sub" id="p-sub">Loading...</div>
+        <div class="p-sub" id="p-sub">Loading voice...</div>
       </div>
     </div>
     <div class="wave" id="wave">
@@ -263,73 +259,41 @@ const mode = sessionStorage.getItem('ll_mode') || 'dictation';
 const lesson = LESSONS_DATA[topicId];
 const SENTENCES = lesson?.sentences || [];
 
+// Hàm hỗ trợ tương thích ngược: Đảm bảo chạy tốt với cả data cũ (có số) và data mới (chỉ text)
+const getSentenceText = (i) => Array.isArray(SENTENCES[i]) ? SENTENCES[i][0] : SENTENCES[i];
+
 let currentUser = null;
 let idx = 0, correct = 0, wrong = 0, hintLevel = 0, answered = false;
-let audioSpeed = 1.0, autoRepeat = true, isPlaying = false, stopTimer = null, audioLoaded = false;
+let audioSpeed = 1.0, autoRepeat = true, isPlaying = false;
+let isFullPlaying = false, isAudioReady = false;
 let scriptVisible = true, recog = null, isRec = false;
 let sessionStart = Date.now();
-let player; // Biến lưu trữ YouTube Player
 
-// ── YouTube API ─────────────────────────────────────────
-function getYouTubeId(url) {
-  if (!url) return null;
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) ? match[2] : null;
-}
+// ── Web Speech API ─────────────────────────────────────
+const synth = window.speechSynthesis;
+let selectedVoice = null;
 
-function initYouTube() {
-  if (window.YT && window.YT.Player) {
-    createPlayer();
-  } else {
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    window.onYouTubeIframeAPIReady = createPlayer;
-  }
-}
-
-function createPlayer() {
-  const videoUrl = lesson.youtubeUrl; 
-  const videoId = getYouTubeId(videoUrl);
-
-  if (!videoId) {
-    document.getElementById('p-sub').textContent = '⚠️ Link YouTube không hợp lệ';
-    return;
-  }
-
-  player = new YT.Player('youtube-player', {
-    height: '1',
-    width: '1',
-    videoId: videoId,
-    playerVars: {
-      'autoplay': 0,
-      'controls': 0,
-      'disablekb': 1,
-      'playsinline': 1,
-      'rel': 0
-    },
-    events: {
-      'onReady': () => {
-        audioLoaded = true;
-        document.getElementById('play-btn').disabled = false;
-        document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
-      },
-      'onStateChange': (event) => {
-        if (event.data === 0 && isFullPlaying) {
-          isFullPlaying = false;
-          document.getElementById('wave').classList.remove('on');
-          document.getElementById('full-btn').textContent = '🎧 Full story';
-          document.getElementById('full-btn').classList.remove('playing');
-          document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
-        }
-      },
-      'onError': () => {
-        document.getElementById('p-sub').textContent = '⚠️ Lỗi tải video YouTube';
-      }
+function initSpeech() {
+  const loadVoices = () => {
+    const voices = synth.getVoices();
+    if (voices.length > 0) {
+      selectedVoice = 
+        voices.find(v => v.name === 'Google US English') ||
+        voices.find(v => v.name.includes('Samantha') && v.lang === 'en-US') ||
+        voices.find(v => (v.name.includes('Aria') || v.name.includes('Guy')) && v.lang === 'en-US') ||
+        voices.find(v => v.lang === 'en-US') ||
+        voices[0];
+      
+      isAudioReady = true;
+      document.getElementById('play-btn').disabled = false;
+      document.getElementById('p-sub').textContent = `Sentence 1 of ${SENTENCES.length} — press ▶ Play`;
     }
-  });
+  };
+
+  if (synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = loadVoices;
+  }
+  loadVoices();
 }
 
 // ── Auth ───────────────────────────────────────────────
@@ -342,47 +306,57 @@ auth.onAuthStateChanged(user => {
   document.getElementById('nav-title').textContent = lesson.title;
   document.getElementById('p-icon').textContent = lesson.emoji;
   document.getElementById('p-title').textContent = lesson.title;
-  document.getElementById('p-sub').textContent = 'Loading audio…';
+  document.getElementById('p-sub').textContent = 'Loading voice…';
   const pill = document.getElementById('mode-pill');
   pill.textContent = mode === 'dictation' ? '✍️ Dictation' : '🎤 Shadowing';
   pill.className = 'mode-pill ' + mode;
   document.getElementById('prog-num').innerHTML = `1 <small>/ ${SENTENCES.length}</small>`;
 
-  // Khởi tạo YouTube Player (Đã xóa toàn bộ phần code liên quan đến thẻ audio cũ)
-  initYouTube();
-
+  initSpeech();
   render();
 });
 
-// ── Audio Controls (YouTube) ───────────────────────────
+// ── Audio Controls (Web Speech API) ────────────────────
 function playCurrent() {
-  if (!audioLoaded || !player) { document.getElementById('p-sub').textContent = '⏳ Loading audio…'; return; }
-  if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
+  if (!isAudioReady) return;
+  stopAudio();
   
-  const [, start, end] = SENTENCES[idx];
-  const duration = (end - start) / audioSpeed;
-  
-  player.setPlaybackRate(audioSpeed);
-  player.seekTo(start, true);
-  player.playVideo();
-  
-  isPlaying = true;
-  document.getElementById('wave').classList.add('on');
-  document.getElementById('play-btn').textContent = '◼ Stop';
-  document.getElementById('play-btn').onclick = stopAudio;
-  document.getElementById('p-sub').textContent = `🔊 Playing sentence ${idx + 1}…`;
-  
-  stopTimer = setTimeout(() => {
-    stopAudio();
-    if (autoRepeat) stopTimer = setTimeout(playCurrent, 700);
-  }, duration * 1000 + 100);
+  let text = getSentenceText(idx);
+  text = text.replace(/^(Speaker \d+|Rose|Sarah): /i, ''); // Loại bỏ tên người nói để AI đọc tự nhiên
+
+  const utter = new SpeechSynthesisUtterance(text);
+  if (selectedVoice) utter.voice = selectedVoice;
+  utter.rate = audioSpeed * 0.9; // Base tốc độ mặc định là 0.9
+  utter.pitch = 1.0;
+  utter.lang = 'en-US';
+
+  utter.onstart = () => {
+    isPlaying = true;
+    document.getElementById('wave').classList.add('on');
+    document.getElementById('play-btn').textContent = '◼ Stop';
+    document.getElementById('play-btn').onclick = stopAudio;
+    document.getElementById('p-sub').textContent = `🔊 Playing sentence ${idx + 1}…`;
+  };
+
+  utter.onend = () => {
+    isPlaying = false;
+    document.getElementById('wave').classList.remove('on');
+    document.getElementById('play-btn').textContent = '▶ Play';
+    document.getElementById('play-btn').onclick = playCurrent;
+    document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
+    
+    // Auto Repeat loop
+    if (autoRepeat && !isFullPlaying) {
+      setTimeout(() => { if (autoRepeat && !isPlaying && !isFullPlaying) playCurrent(); }, 700);
+    }
+  };
+
+  utter.onerror = () => stopAudio();
+  synth.speak(utter);
 }
 
 function stopAudio() {
-  if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
-  if (player && typeof player.pauseVideo === 'function') {
-    player.pauseVideo();
-  }
+  synth.cancel();
   isPlaying = false;
   isFullPlaying = false;
   document.getElementById('wave').classList.remove('on');
@@ -393,25 +367,45 @@ function stopAudio() {
   document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length} — press ▶ Play`;
 }
 
-let isFullPlaying = false;
 function toggleFullStory() {
-  if (!audioLoaded || !player) return;
+  if (!isAudioReady) return;
   if (isFullPlaying) {
     stopAudio();
     return;
   }
   
-  if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
-  
+  stopAudio();
   isFullPlaying = true;
-  player.setPlaybackRate(audioSpeed);
-  player.seekTo(0, true);
-  player.playVideo();
-
   document.getElementById('wave').classList.add('on');
   document.getElementById('full-btn').textContent = '⏹ Stop';
   document.getElementById('full-btn').classList.add('playing');
   document.getElementById('p-sub').textContent = '🎧 Playing full story…';
+
+  let currentFullIdx = 0;
+  
+  const playNext = () => {
+    if (!isFullPlaying) return;
+    if (currentFullIdx >= SENTENCES.length) {
+      stopAudio();
+      return;
+    }
+    
+    let text = getSentenceText(currentFullIdx);
+    text = text.replace(/^(Speaker \d+|Rose|Sarah): /i, '');
+
+    const utter = new SpeechSynthesisUtterance(text);
+    if (selectedVoice) utter.voice = selectedVoice;
+    utter.rate = audioSpeed * 0.9;
+    
+    utter.onend = () => {
+      currentFullIdx++;
+      playNext(); // Đọc câu tiếp theo
+    };
+    
+    synth.speak(utter);
+  };
+  
+  playNext();
 }
 
 function toggleRepeat() {
@@ -424,22 +418,25 @@ function setSpeed(s, el) {
   document.querySelectorAll('.spd').forEach(b => b.classList.remove('on'));
   el.classList.add('on');
   
-  if (player && typeof player.setPlaybackRate === 'function') {
-    player.setPlaybackRate(s);
+  // Với Web Speech, phải stop mới cập nhật được speed của Utterance đang chạy
+  if (isPlaying || isFullPlaying) {
+    const wasFull = isFullPlaying;
+    stopAudio();
+    if(!wasFull) setTimeout(playCurrent, 200);
   }
-  
-  if (isPlaying) { stopAudio(); setTimeout(playCurrent, 200); }
 }
 
 // ── Render ─────────────────────────────────────────────
 function render() {
   if (idx >= SENTENCES.length) { showComplete(); return; }
   stopAudio();
+  
   const pct = Math.round(idx / SENTENCES.length * 100);
   document.getElementById('prog-fill').style.width = pct + '%';
   document.getElementById('prog-num').innerHTML = `${idx+1} <small>/ ${SENTENCES.length}</small>`;
   document.getElementById('p-sub').textContent = `Sentence ${idx+1} of ${SENTENCES.length}`;
   answered = false; hintLevel = 0;
+  
   const card = document.getElementById('practice');
   card.style.animation = 'none'; requestAnimationFrame(() => card.style.animation = '');
 
@@ -456,7 +453,7 @@ function render() {
   } else {
     document.getElementById('d-panel').style.display = 'none';
     document.getElementById('s-panel').style.display = 'block';
-    document.getElementById('s-script').textContent = SENTENCES[idx][0];
+    document.getElementById('s-script').textContent = getSentenceText(idx);
     document.getElementById('s-script').classList.toggle('blurred', !scriptVisible);
     document.getElementById('transcript-box').style.display = 'none';
     document.getElementById('s-fb').style.display = 'none';
@@ -502,7 +499,7 @@ function norm(s) {
 
 function doHint() {
   hintLevel = Math.min(hintLevel+1, 2);
-  const words = SENTENCES[idx][0].split(' ');
+  const words = getSentenceText(idx).split(' ');
   const h = hintLevel===1 ? words.length+' words' : words.map(w=>w[0]+'_'.repeat(Math.max(w.length-1,1))).join('  ');
   const el = document.getElementById('hint-box');
   el.textContent = '💡 '+h; el.style.display = 'block';
@@ -513,7 +510,8 @@ function doCheck() {
   const val = document.getElementById('t-in').value.trim();
   if (!val) { document.getElementById('t-in').focus(); return; }
   stopAudio();
-  const target = SENTENCES[idx][0];
+  
+  const target = getSentenceText(idx);
   const iw = norm(val).split(' '), tw = norm(target).split(' ');
   const perfect = norm(val) === norm(target);
   const fb = document.getElementById('d-fb');
@@ -556,7 +554,7 @@ function toggleScript() {
 
 function toggleMic() {
   const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
-  if (!SR) { alert('Speech recognition requires Google Chrome.'); return; }
+  if (!SR) { alert('Speech recognition requires Google Chrome or Safari.'); return; }
   isRec ? stopRec() : startRec();
 }
 
@@ -572,6 +570,7 @@ function startRec() {
   const tb=document.getElementById('transcript-box');
   tb.style.display='block'; tb.textContent='…listening…';
   let finalText='';
+  
   recog.onresult=e=>{
     let interim=''; finalText='';
     for(let i=e.resultIndex;i<e.results.length;i++){
@@ -580,6 +579,7 @@ function startRec() {
     }
     tb.textContent=finalText||interim||'…';
   };
+  
   recog.onend=()=>{
     isRec=false;
     document.getElementById('mic-btn').className='mic-btn';
@@ -588,6 +588,7 @@ function startRec() {
     document.getElementById('mic-st').className='mic-status';
     if(finalText) analyzeShad(finalText);
   };
+  
   recog.onerror=e=>{
     isRec=false;
     document.getElementById('mic-btn').className='mic-btn';
@@ -596,33 +597,29 @@ function startRec() {
     document.getElementById('mic-st').textContent=msgs[e.error]||'Error: '+e.error;
     document.getElementById('mic-st').className='mic-status';
   };
+  
   recog.start();
 }
+
 function stopRec() { if(recog) recog.stop(); isRec=false; }
 
 function analyzeShad(transcript) {
-  // Lấy mảng từ của câu gốc và câu người dùng đọc
-  const tw = norm(SENTENCES[idx][0]).split(' ');
+  const tw = norm(getSentenceText(idx)).split(' ');
   const rw = norm(transcript).split(' ');
 
   let hits = 0;
-  let targetWords = [...tw]; // Tạo một bản sao của câu gốc để đối chiếu
+  let targetWords = [...tw]; 
 
-  // Kiểm tra từng từ người dùng đọc
   for (let word of rw) {
-    if (!word) continue; // Bỏ qua khoảng trắng rỗng
-    
-    // Tìm vị trí của từ này trong câu gốc
+    if (!word) continue; 
     const foundIdx = targetWords.indexOf(word);
     if (foundIdx !== -1) {
       hits++;
-      targetWords.splice(foundIdx, 1); // Xóa từ đã khớp để không tính lặp (chống spam 1 từ)
+      targetWords.splice(foundIdx, 1); 
     }
   }
 
-  // Tính phần trăm chính xác (tối đa 100%)
   const pct = Math.min(100, Math.round((hits / tw.length) * 100));
-
   const fb = document.getElementById('s-fb');
   const head = document.getElementById('s-fb-h');
   fb.style.display = 'block';
@@ -681,13 +678,12 @@ async function showComplete() {
       const doc = await userRef.get();
       const data = doc.exists ? doc.data() : {};
 
-      // Streak logic
       let streak = data.streak || 0;
       let longestStreak = data.longestStreak || 0;
       const lastDate = data.lastStudyDate;
       const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
       const yesterdayStr = yesterday.toISOString().split('T')[0];
-      if (lastDate === today) { /* already today */ }
+      if (lastDate === today) { }
       else if (lastDate === yesterdayStr) { streak += 1; }
       else { streak = 1; }
       longestStreak = Math.max(longestStreak, streak);
